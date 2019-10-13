@@ -85,6 +85,44 @@ void Window::SetWindowTitle(const std::string& title)
 	}
 }
 
+//std::optional<int> Window::ProcessMessages()
+void Window::ProcessMessages()
+{
+	// message pump
+	MSG msg;
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		if (msg.message == WM_QUIT)
+		{
+			*Locator::GetExitBool() = true;
+			//return msg.wParam;
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+
+
+		//if (Locator::GetKey()->IsKeyDown('C'))
+		//{
+		//	wnd->SetWindowTitle("Ya MUM");
+		//}
+		//if (Locator::GetKey()->IsKeyDown(VK_DOWN))
+		//{
+		//	wnd->SetWindowTitle("HEY");
+		//}
+
+		//if (Locator::GetMouse()->IsOnScreen())
+		//{
+		//	wnd->SetWindowTitle("Mouse State: " + std::to_string((int)Locator::GetMouse()->state()));
+		//}
+		//if (Locator::GetMouse()->IsOnScreen() && Locator::GetMouse()->IsButtonRepeated(0))
+		//{
+		//	wnd.SetWindowTitle("Mouse Pos: " + std::to_string(Locator::GetMouse()->GetXPos()) + ',' + std::to_string(Locator::GetMouse()->GetYPos()));
+		//}
+	}
+	//return {};
+}
+
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 {
 	// use create parameter passed in from CreateWindow() to store window class pointer at WinAPI side

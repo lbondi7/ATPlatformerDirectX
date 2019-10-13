@@ -22,10 +22,21 @@ public:
 		mouse = _mouse;
 	}
 
+	static void InitExitBool()
+	{ 
+		exit = new bool;
+		*exit = false;
+	}
+
+	static bool* GetExitBool()
+	{
+		return exit;
+	}
+
 
 private:
 	static Keyboard* key;
 	static Mouse* mouse;
-
+	static bool* exit;
 };
 
