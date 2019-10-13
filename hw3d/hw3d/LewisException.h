@@ -16,3 +16,4 @@ private:
 	std::string file;
 protected:
 	mutable std::string whatBuffer;
+};
