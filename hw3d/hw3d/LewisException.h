@@ -1,4 +1,6 @@
 #pragma once
+#include"WinSetup.h"
+
 #include <exception>
 #include <string>
 
@@ -17,3 +19,4 @@ private:
 protected:
 	mutable std::string whatBuffer;
 };
+

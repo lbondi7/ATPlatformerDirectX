@@ -1,26 +1,23 @@
 #pragma once
 #include "WinSetup.h"
 #include "LewisException.h"
+#include "Graphics.h"
 #include <optional>
+#include <memory>
 
 
 class Window
 {
-public :
-	class Exception : public LewisException
-	{
-	public:
-		Exception(int line, const char* file, HRESULT hr) noexcept;
-		const char* what() const noexcept override;
-		virtual const char* GetType() const noexcept;
-		static std::string TranslateErrorCode(HRESULT hr) noexcept;
-		HRESULT GetErrorCode() const noexcept;
-		std::string GetErrorString() const noexcept;
-	private:
-		HRESULT hr;
-	};
+public:
+	Window(int width, int height, const char* name);
+	~Window();
+	Window(const Window&) = delete;
+	Window& operator=(const Window&) = delete;
+	void SetWindowTitle(const std::string& title);
+	//static std::optional<int> ProcessMessages();
+	static void ProcessMessages();
+	Graphics* GetGraphics();
 private:
-	// singleton manages registration/cleanup of window class
 	class WindowClass
 	{
 	public:
@@ -35,25 +32,13 @@ private:
 		static WindowClass wndClass;
 		HINSTANCE hInst;
 	};
-public:
-	Window(int width, int height, const char* name);
-	~Window();
-	Window(const Window&) = delete;
-	Window& operator=(const Window&) = delete;
-	void SetWindowTitle(const std::string& title);
-	//static std::optional<int> ProcessMessages();
-	static void ProcessMessages();
-private:
+
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 
 	int width;
 	int height;
-	HWND hWnd;
+	HWND hWindow;
+	std::unique_ptr<Graphics> pGraphics;
 };
-
-// error exception helper macro
-
-#define LHWND_EXCEPT(hr) Window::Exception( __LINE__,__FILE__,hr);
-#define LHWND_PREV_EXCEPT() Window::Exception( __LINE__,__FILE__,GetLastError());

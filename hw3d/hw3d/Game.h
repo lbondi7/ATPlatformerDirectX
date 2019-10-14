@@ -8,12 +8,12 @@ public:
 	Game();
 
 	bool Init();
-	int Run();
-	void Update();
+	void Run();
 	void Exit();
 
 private:
-	Window* wnd = nullptr;
+	void Update();
+	Window* window = nullptr;
 	Timer timer;
 };
 

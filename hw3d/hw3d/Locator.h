@@ -2,6 +2,7 @@
 
 class Keyboard;
 class Mouse;
+class LewisException;
 
 class Locator
 {
@@ -22,6 +23,14 @@ public:
 		mouse = _mouse;
 	}
 
+	static LewisException* GetException() {
+		return except;
+	}
+
+	static void InitException(LewisException* except_){
+		except = except_;
+	}
+
 	static void InitExitBool()
 	{ 
 		exit = new bool;
@@ -37,6 +46,7 @@ public:
 private:
 	static Keyboard* key;
 	static Mouse* mouse;
+	static LewisException* except;
 	static bool* exit;
 };
 

@@ -1,12 +1,10 @@
 #include "Window.h"
-#include <sstream>
 #include "resource.h"
-#include"Locator.h"
-#include"Keyboard.h"
+#include "Locator.h"
+#include "Keyboard.h"
 #include "Mouse.h"
 
-
-
+#include <sstream>
 
 // Window Class Stuff
 Window::WindowClass Window::WindowClass::wndClass;
@@ -56,32 +54,34 @@ Window::Window(int width, int height, const char* name) : width(width), height(h
 	wr.right = width + wr.left;
 	wr.top = 100;
 	wr.bottom = height + wr.top;
+
 	if (AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0)
 	{
-		throw LHWND_PREV_EXCEPT();
+		MessageBox(nullptr, "FAILED TO ADJUST WINDOW RECT", "Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	// create window & get hWnd
-	hWnd = CreateWindow(
+	hWindow = CreateWindow(
 		WindowClass::GetName(), name,
 		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
 		nullptr, nullptr, WindowClass::GetInstance(), this
 	);
 	// newly created windows start off as hidden
-	ShowWindow(hWnd, SW_SHOWDEFAULT);
+	ShowWindow(hWindow, SW_SHOWDEFAULT);
+	pGraphics = std::make_unique<Graphics>(hWindow);
 }
 
 Window::~Window()
 {
-	DestroyWindow(hWnd);
+	DestroyWindow(hWindow);
 }
 
 void Window::SetWindowTitle(const std::string& title)
 {
-	if (SetWindowText(hWnd, title.c_str()) == 0)
+	if (SetWindowText(hWindow, title.c_str()) == 0)
 	{
-		throw LHWND_PREV_EXCEPT();
+		MessageBox(nullptr, "FAILED TO SET WINDOW TEXT", "Exception", MB_OK | MB_ICONEXCLAMATION);
 	}
 }
 
@@ -100,27 +100,12 @@ void Window::ProcessMessages()
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
-
-
-		//if (Locator::GetKey()->IsKeyDown('C'))
-		//{
-		//	wnd->SetWindowTitle("Ya MUM");
-		//}
-		//if (Locator::GetKey()->IsKeyDown(VK_DOWN))
-		//{
-		//	wnd->SetWindowTitle("HEY");
-		//}
-
-		//if (Locator::GetMouse()->IsOnScreen())
-		//{
-		//	wnd->SetWindowTitle("Mouse State: " + std::to_string((int)Locator::GetMouse()->state()));
-		//}
-		//if (Locator::GetMouse()->IsOnScreen() && Locator::GetMouse()->IsButtonRepeated(0))
-		//{
-		//	wnd.SetWindowTitle("Mouse Pos: " + std::to_string(Locator::GetMouse()->GetXPos()) + ',' + std::to_string(Locator::GetMouse()->GetYPos()));
-		//}
 	}
-	//return {};
+}
+
+Graphics* Window::GetGraphics()
+{
+	return pGraphics.get();
 }
 
 LRESULT CALLBACK Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -162,58 +147,9 @@ LRESULT Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noe
 		break;
 	}
 
-	Locator::GetKey()->Update(msg, wParam);
-	Locator::GetMouse()->HandlerUpdate(msg, lParam, width, height);
+	if(Locator::GetKey())
+		Locator::GetKey()->Update(msg, wParam);
+	if (Locator::GetMouse())
+		Locator::GetMouse()->HandlerUpdate(msg, lParam, width, height);
 	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-// windows exception
-
-Window::Exception::Exception(int line, const char* file, HRESULT hr) noexcept
-	: 
-	LewisException(line, file),
-	hr(hr)
-{
-}
-
-const char* Window::Exception::what() const noexcept
-{
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-const char* Window::Exception::GetType() const noexcept
-{
-	return "Lewis Window Exception";
-}
-
-std::string Window::Exception::TranslateErrorCode(HRESULT hr) noexcept
-{
-	char* pMsgBuf = nullptr;
-	DWORD nMsgLen = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		nullptr, hr, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-		reinterpret_cast<LPSTR>(&pMsgBuf), 0, nullptr
-	);
-
-	if (nMsgLen == 0)
-	{
-		return "Unidentified error code";
-	}
-	std::string errorString = pMsgBuf;
-	LocalFree(pMsgBuf);
-	return errorString;
-}
-
-HRESULT Window::Exception::GetErrorCode() const noexcept
-{
-	return hr;
-}
-
-std::string Window::Exception::GetErrorString() const noexcept
-{
-	return TranslateErrorCode(hr);
 }
