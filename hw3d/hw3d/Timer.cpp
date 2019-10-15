@@ -21,8 +21,12 @@ float Timer::Peek() const
 
 float Timer::DeltaTime()
 {
+	return deltaTime.count() / 1000.0f;
+}
+
+void Timer::SetDeltaTime()
+{
 	const auto old = deltaLast;
 	deltaLast = std::chrono::steady_clock::now();
-	const std::chrono::duration<float> deltaTime = deltaLast - old;
-	return deltaTime.count();
+	deltaTime = deltaLast - old;
 }

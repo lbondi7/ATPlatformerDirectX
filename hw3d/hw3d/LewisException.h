@@ -1,13 +1,11 @@
 #pragma once
-#include"WinSetup.h"
-
 #include <exception>
 #include <string>
 
 class LewisException : public std::exception
 {
 public:
-	LewisException(int line, const char* file) noexcept;
+	LewisException( int line,const char* file ) noexcept;
 	const char* what() const noexcept override;
 	virtual const char* GetType() const noexcept;
 	int GetLine() const noexcept;
@@ -19,4 +17,3 @@ private:
 protected:
 	mutable std::string whatBuffer;
 };
-

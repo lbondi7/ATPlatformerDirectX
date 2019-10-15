@@ -2,7 +2,7 @@
 #include "Locator.h"
 #include "Keyboard.h"
 #include "Mouse.h"
-#include "LewisException.h"
+#include "Timer.h"
 
 #include <iomanip>
 #include <thread>
@@ -17,6 +17,7 @@ bool Game::Init()
 
 	Locator::InitKey(new Keyboard());
 	Locator::InitMouse(new Mouse());
+	Locator::InitTimer(new Timer());
 	Locator::InitExitBool();
 	Locator::GetKey()->Initialise();
 	Locator::GetMouse()->Initialise();
@@ -28,7 +29,8 @@ void Game::Run()
 {
 	while (*Locator::GetExitBool() != true)
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		Locator::GetTimer()->SetDeltaTime();
 		//if (const auto ecode = Window::ProcessMessages())
 		//{
 		//	return *ecode;
@@ -40,12 +42,9 @@ void Game::Run()
 
 void Game::Update()
 {
-	const float r = sin(timer.Peek());
-	const float g = sin(timer.Peek() * 2.0f);
-	const float b = sin(timer.Peek() / 2.0f);
-	const float a = 1.0f;
-	window->GetGraphics()->ClearBuffer(r, g, b, a);
-	window->GetGraphics()->DrawTestTriangle();
+	window->GetGraphics()->ClearBuffer(1.0f, 1.0f, 1.0f, 0.0f);
+	window->GetGraphics()->DrawTestTriangle(70.5f, -0.5f, 10);
+	window->GetGraphics()->DrawTestTriangle(5.0f, 0.5f, 10);
 	window->GetGraphics()->EndFrame();
 	//const float t = timer.Peek();
 	//window->SetWindowTitle("Seconds: " + std::to_string((int)t) + " - Delta Time: " + std::to_string(timer.DeltaTime()));

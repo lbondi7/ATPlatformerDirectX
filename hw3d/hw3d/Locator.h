@@ -2,7 +2,7 @@
 
 class Keyboard;
 class Mouse;
-class LewisException;
+class Timer;
 
 class Locator
 {
@@ -23,30 +23,27 @@ public:
 		mouse = _mouse;
 	}
 
-	static LewisException* GetException() {
-		return except;
+	static Timer* GetTimer() {
+		return timer;
 	}
 
-	static void InitException(LewisException* except_){
-		except = except_;
+	static void InitTimer(Timer* _timer){
+		timer = _timer;
 	}
 
-	static void InitExitBool()
-	{ 
+	static bool* GetExitBool() {
+		return exit;
+	}
+
+	static void InitExitBool(){ 
 		exit = new bool;
 		*exit = false;
 	}
 
-	static bool* GetExitBool()
-	{
-		return exit;
-	}
-
-
 private:
 	static Keyboard* key;
 	static Mouse* mouse;
-	static LewisException* except;
+	static Timer* timer;
 	static bool* exit;
 };
 

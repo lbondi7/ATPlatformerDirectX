@@ -2,5 +2,5 @@
 
 Keyboard* Locator::key = nullptr;
 Mouse* Locator::mouse = nullptr;
-LewisException* Locator::except = nullptr;
+Timer* Locator::timer = nullptr;
 bool* Locator::exit = nullptr;
