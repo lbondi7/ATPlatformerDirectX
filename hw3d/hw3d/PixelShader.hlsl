@@ -3,8 +3,14 @@ cbuffer cBuf
 	float4 face_colours[6];
 };
 
-float4 main(uint tid : SV_PrimitiveID) : SV_TARGET
+struct PixelInputType
 {
-	return face_colours[tid / 2];
+	float4 color : COLOR;
+	float4 position : SV_POSITION;
+};
+
+float4 main(PixelInputType input) : SV_TARGET
+{
+	return input.color;
 	//return float4(colour.r, colour.g, colour.b, colour.a);
 }

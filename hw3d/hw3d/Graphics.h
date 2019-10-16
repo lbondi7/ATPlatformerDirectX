@@ -1,10 +1,14 @@
 #pragma once
 #include "WinSetup.h"
 #include "LewisException.h"
+#include "DxgiInfoManager.h"
+#include "D3D.h"
+#include "Buffers.h"
+
 #include <d3d11.h>
 #include <wrl.h>
 #include <vector>
-#include "DxgiInfoManager.h"
+#include <memory>
 
 class Graphics
 {
@@ -52,7 +56,7 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer( float r,float g,float b, float a) noexcept;
-	void DrawTestTriangle(float _angle, float x, float z);
+	void DrawTestTriangle(float _angle, float x, float z, const std::string& shapeName);
 private:
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;
@@ -62,4 +66,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepStenView;
+	std::unique_ptr<D3D> d3d;
 };
