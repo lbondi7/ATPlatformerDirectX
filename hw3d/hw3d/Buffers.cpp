@@ -89,8 +89,10 @@ void Buffers::CreateVertexBuffer(const std::string& shapeName)
 	VertexType* vertices = new VertexType[vertexCount];
 
 	for (int i = 0; i < vertexCount; ++i) {
-		auto vertex = shapeJson["Vertecies"][std::to_string(i)];
-		vertices[i] = { vertex[0],vertex[1],vertex[2],vertex[3],vertex[4],vertex[5],vertex[6],vertex[7] };
+		auto vertex = shapeJson["Vertecies"]["Position"][std::to_string(i)];
+		//auto colour = shapeJson["Vertecies"]["Colour"][std::to_string(i)];
+		auto tex = shapeJson["Vertecies"]["Texture"][std::to_string(i)];
+		vertices[i] = { vertex[0],vertex[1],vertex[2],vertex[3],tex[0],tex[1]};
 	}
 
 	//VertexType vertices[] =

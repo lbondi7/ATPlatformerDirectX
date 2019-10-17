@@ -91,6 +91,7 @@ Graphics::Graphics( HWND hWnd )
 
 	Locator::GetBuffers()->CreateBuffer("cube");
 	Locator::GetBuffers()->CreateBuffer("triangle");
+	Locator::GetBuffers()->CreateBuffer("square");
 
 	//rasterDesc.AntialiasedLineEnable = false;
 	//rasterDesc.CullMode = D3D11_CULL_BACK;

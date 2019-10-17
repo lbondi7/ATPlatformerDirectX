@@ -28,5 +28,5 @@ private:
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Model> model2;
 	std::unique_ptr<Camera> cam;
+	//std::vector<Model> models;
 };
-

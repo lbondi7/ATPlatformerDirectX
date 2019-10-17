@@ -4,10 +4,10 @@
 #include "Timer.h"
 #include "Keyboard.h"
 #include "Graphics.h"
-
 #include "WinSetup.h"
 
 #include <iostream>
+#include <random>
 
 
 GameScene::~GameScene()
@@ -19,12 +19,17 @@ bool GameScene::Init()
 {
 	model = std::make_unique<Model>();
 	model2 = std::make_unique<Model>();
-	model->Init();
-	model2->Init();
+	Locator::GetGraphics()->DrawGeometry(model->Init());
+	Locator::GetGraphics()->DrawGeometry(model2->Init());
 
-	model->SetPos(-0.5f, -0.5f, 8);
-	model2->SetPos(0.5f, 0.5f, 3);
-	model->SetGeometry("triangle");
+	for (int i = 0; i < 30; i++)
+	{
+
+	}
+
+	model->SetPos(0.0f, 0.0f, 2);
+	model2->SetPos(0.0f, 0.0f, 5);
+	model->SetGeometry("square");
 	model2->SetGeometry("cube");
 
 	cam = std::make_unique<Camera>();
@@ -54,6 +59,7 @@ Scene::CurrentScene GameScene::Update()
 		//DirectX::XMVECTOR forward = {0, 0, 1, 0};
 		//forward = DirectX::XMVector4Transform(forward, cam->GetViewMatrix());
 		//cam->SetPos(DirectX::XMVectorAdd(cam->GetPos(),));
+		cam->SetPosZ(cam->GetPosZ() - speed * Locator::GetTimer()->DeltaTime());
 	}
 	else if (Locator::GetKey()->IsKeyPressed(VK_NUMPAD8) || Locator::GetKey()->IsKeyRepeated(VK_NUMPAD8))
 	{

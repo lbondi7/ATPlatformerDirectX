@@ -46,9 +46,14 @@ private:
 
 		struct
 		{
-			DirectX::XMVECTOR color;
-		}color;
+			float u;
+			float v;
+		}txt;
+
+		//struct
+		//{
+		//	DirectX::XMVECTOR color;
+		//}color;
 	};
 
 };
-

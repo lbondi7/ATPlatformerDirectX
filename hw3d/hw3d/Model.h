@@ -5,6 +5,7 @@
 #include <wrl.h>
 #include <d3dcompiler.h>
 #include <d3d11.h>
+#include <stdio.h>
 
 class Model
 {
@@ -12,11 +13,13 @@ public:
 	Model();
 	~Model();
 
-	bool Init();
+	HRESULT Init();
 	void Update();
 	HRESULT Render(DirectX::XMMATRIX viewMatrix);
 
 	void UpdateConstantBuffer();
+
+	bool LoadTarga(char* filename, int& height, int& width);
 
 	DirectX::XMVECTOR GetPos();
 	float GetPosX();
@@ -43,7 +46,7 @@ public:
 private:
 
 	std::string shapeType;
-	
+
 	float x;
 	float y;
 	float z;
@@ -52,6 +55,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
+	ID3D11SamplerState* m_sampleState;
 	DirectX::XMMATRIX m_worldMatrix;
 	ID3D11Buffer* m_matrixBuffer;
 	struct MatrixBufferType
@@ -60,5 +64,16 @@ private:
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
-};
 
+	struct TargaHeader
+	{
+		unsigned char data1[12];
+		unsigned short width;
+		unsigned short height;
+		unsigned char bpp;
+		unsigned char data2;
+	};
+	unsigned char* m_targaData;
+	ID3D11Texture2D* m_texture;
+	ID3D11ShaderResourceView* m_textureView;
+};
