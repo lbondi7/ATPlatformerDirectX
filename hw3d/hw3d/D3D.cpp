@@ -1,9 +1,8 @@
 #include "D3D.h"
 
-#pragma comment(lib,"d3d11.lib")
-#pragma comment(lib,"D3DCompiler.lib")
+namespace dx = DirectX;
 
-void D3D::Init(HWND hWnd)
+HRESULT D3D::Init(HWND hWnd)
 {
 	DXGI_SWAP_CHAIN_DESC sd = {};
 	sd.BufferDesc.Width = 0;
@@ -31,7 +30,7 @@ void D3D::Init(HWND hWnd)
 	HRESULT hr;
 
 	// create device and front/back buffers, and swap chain and rendering context
-	D3D11CreateDeviceAndSwapChain(
+	hr = D3D11CreateDeviceAndSwapChain(
 		nullptr,
 		D3D_DRIVER_TYPE_HARDWARE,
 		nullptr,
@@ -40,26 +39,59 @@ void D3D::Init(HWND hWnd)
 		0,
 		D3D11_SDK_VERSION,
 		&sd,
-		&pSwapChain,
-		&pDevice,
+		&p_swapChain,
+		&p_device,
 		nullptr,
-		&pDeviceContext
+		&p_deviceContext
 	);
+
+	float fieldOfView = (float)dx::XM_PI / 4.0f;
+	float screenAspect = (float)500 / (float)500;
+
+	//// Create the projection matrix for 3D rendering.
+	//D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
+
+
+	m_projectionMatrix = dx::XMMatrixPerspectiveFovLH(1.0f, screenAspect, 0.1f, 1000.0f);
+	m_worldMatrix = dx::XMMatrixIdentity();
+
+
+	return hr;
 }
 
 ID3D11Device* D3D::GetDevice()
 {
-	return pDevice;
+	return p_device;
 }
 
 IDXGISwapChain* D3D::GetSwapChain()
 {
-	return pSwapChain;
+	return p_swapChain;
 }
 
 ID3D11DeviceContext* D3D::GetDeviceContext()
 {
-	return pDeviceContext;
+	return p_deviceContext;
+}
+
+DirectX::XMMATRIX D3D::GetWorldMatrix()
+{
+	return m_worldMatrix;
+}
+
+DirectX::XMMATRIX D3D::GetProjMatrix()
+{
+	return m_projectionMatrix;
+}
+
+void D3D::SetWorldMatrix(DirectX::XMMATRIX maxtrix)
+{
+	m_worldMatrix = maxtrix;
+}
+
+void D3D::SetProjMatrix(DirectX::XMMATRIX maxtrix)
+{
+	m_projectionMatrix = maxtrix;
 }
 
 //Microsoft::WRL::ComPtr<ID3D11Device> D3D::GetDevice()

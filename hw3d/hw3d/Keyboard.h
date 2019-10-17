@@ -7,21 +7,40 @@ public :
 	Keyboard();
 	~Keyboard();
 
+
+	enum class State : int {
+		NO_IMPUT = 0,
+		PRESSED = 1,
+		RELEASED = 2,
+		REPEATED = 3
+	};
+
+
 	void Initialise();
 
-	void Update(const UINT& msg, const WPARAM& wParam);
+	void Update();
 
-	void KeyPressed(unsigned int key);
+	void HandlerUpdate(const UINT& msg, const WPARAM& wParam);
 
-	void KeyReleased(unsigned int key);
+	//void KeyPressed(unsigned int key);
 
-	bool IsKeyDown(unsigned int key);
+	//void KeyReleased(unsigned int key);
+
+	bool IsKeyRepeated(unsigned int btn);
+
+	bool IsKeyReleased(unsigned int btn);
+
+	bool IsKeyPressed(unsigned int btn);
+
+	//bool IsKeyDown(unsigned int key);
 
 
 private:
 	bool mKeyDown = false;
 	bool mKeyUp = false;
 
+	State keyState[256];
+	State keyPrevState[256];
 	bool mKeysDown[256];
 };
 

@@ -77,6 +77,7 @@ Window::Window( int width,int height,const char* name )
 	ShowWindow( hWnd,SW_SHOWDEFAULT );
 	// create graphics object
 	pGraphics = std::make_unique<Graphics>( hWnd );
+	Locator::InitGraphics(pGraphics.get());
 }
 
 Window::~Window()
@@ -259,7 +260,7 @@ LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noex
 	}
 
 	if (Locator::GetKey())
-		Locator::GetKey()->Update(msg, wParam);
+		Locator::GetKey()->HandlerUpdate(msg, wParam);
 	if (Locator::GetMouse())
 		Locator::GetMouse()->HandlerUpdate(msg, lParam, width, height);
 

@@ -5,6 +5,7 @@ class Mouse;
 class Timer;
 class Buffers;
 class D3D;
+class Graphics;
 
 class Locator
 {
@@ -58,6 +59,14 @@ public:
 		d3d = _d3d;
 	}
 
+	static Graphics* GetGraphics(){
+		return graphic;
+	}
+
+	static void InitGraphics(Graphics* _graphic){
+		graphic = _graphic;
+	}
+
 private:
 	// Static Classes
 	static Keyboard* key;
@@ -65,6 +74,7 @@ private:
 	static Timer* timer;
 	static Buffers* buffer;
 	static D3D* d3d;
+	static Graphics* graphic;
 
 	// STatic Variables
 	static bool* exit;

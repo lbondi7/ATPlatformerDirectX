@@ -33,26 +33,26 @@ namespace dx = DirectX;
 
 Graphics::Graphics( HWND hWnd )
 {
-	// for checking results of Locator::GetD3D() functions
+	// for checking results of d3d functions
 	HRESULT hr;
 
 	d3d = std::make_unique<D3D>();
-	d3d->Init(hWnd);
+	GRAPHICS_THROW_INFO( d3d->Init(hWnd));
 	Locator::InitD3D(d3d.get());
 
 	// gain access to texture subresource in swap chain (back buffer)
 	wrl::ComPtr<ID3D11Resource> pBackBuffer;
-	GRAPHICS_THROW_INFO( Locator::GetD3D()->GetSwapChain()->GetBuffer( 0,__uuidof(ID3D11Resource),&pBackBuffer ) );
-	GRAPHICS_THROW_INFO( Locator::GetD3D()->GetDevice()->CreateRenderTargetView( pBackBuffer.Get(),nullptr,&pTargetView ) );
+	GRAPHICS_THROW_INFO( d3d->GetSwapChain()->GetBuffer( 0,__uuidof(ID3D11Resource),&pBackBuffer ) );
+	GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateRenderTargetView( pBackBuffer.Get(),nullptr,&pTargetView ) );
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	wrl::ComPtr<ID3D11DepthStencilState> pDDState;
-	GRAPHICS_THROW_INFO(Locator::GetD3D()->GetDevice()->CreateDepthStencilState(&dsDesc, &pDDState));
+	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilState(&dsDesc, &pDDState));
 
-	Locator::GetD3D()->GetDeviceContext()->OMSetDepthStencilState(pDDState.Get(), 1u);
+	d3d->GetDeviceContext()->OMSetDepthStencilState(pDDState.Get(), 1u);
 
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
@@ -66,20 +66,52 @@ Graphics::Graphics( HWND hWnd )
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-	GRAPHICS_THROW_INFO(Locator::GetD3D()->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
+	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
 
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDepStenView = {};
 	descDepStenView.Format = DXGI_FORMAT_D32_FLOAT;
 	descDepStenView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDepStenView.Texture2D.MipSlice = 0u;
-	GRAPHICS_THROW_INFO(Locator::GetD3D()->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
+	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
 
 	// bind render target
-	Locator::GetD3D()->GetDeviceContext()->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), pDepStenView.Get());
+	d3d->GetDeviceContext()->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), pDepStenView.Get());
+
+
+	// configure viewport
+	D3D11_VIEWPORT viewport;
+	viewport.Width = 500;
+	viewport.Height = 500;
+	viewport.MinDepth = 0;
+	viewport.MaxDepth = 1;
+	viewport.TopLeftX = 0;
+	viewport.TopLeftY = 0;
+	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
 	Locator::GetBuffers()->CreateBuffer("cube");
 	Locator::GetBuffers()->CreateBuffer("triangle");
+
+	//rasterDesc.AntialiasedLineEnable = false;
+	//rasterDesc.CullMode = D3D11_CULL_BACK;
+	//rasterDesc.DepthBias = 0;
+	//rasterDesc.DepthBiasClamp = 0.0f;
+	//rasterDesc.DepthClipEnable = true;
+	//rasterDesc.FillMode = D3D11_FILL_SOLID;
+	//rasterDesc.FrontCounterClockwise = false;
+	//rasterDesc.MultisampleEnable = false;
+	//rasterDesc.ScissorEnable = false;
+	//rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	//// Create the rasterizer state from the description we just filled out.
+	//result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	//if (FAILED(result))
+	//{
+	//	return false;
+	//}
+
+	//// Now set the rasterizer state.
+	//m_deviceContext->RSSetState(m_rasterState);
 }
 
 void Graphics::EndFrame()
@@ -88,11 +120,11 @@ void Graphics::EndFrame()
 #ifndef NDEBUG
 	infoManager.Set();
 #endif
-	if( FAILED( hr = Locator::GetD3D()->GetSwapChain()->Present( 1u,0u ) ) )
+	if( FAILED( hr = d3d->GetSwapChain()->Present( 1u,0u ) ) )
 	{
 		if( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
-			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(Locator::GetD3D()->GetDevice()->GetDeviceRemovedReason() );
+			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(d3d->GetDevice()->GetDeviceRemovedReason() );
 		}
 		else
 		{
@@ -104,104 +136,112 @@ void Graphics::EndFrame()
 void Graphics::ClearBuffer( float r,float g,float b , float a) noexcept
 {
 	const float color[] = { r, g, b, a };
-	Locator::GetD3D()->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),color );
-	Locator::GetD3D()->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),color );
+	d3d->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-void Graphics::DrawTestTriangle(float _angle, float x, float z, const std::string& shapeName)
+void Graphics::DrawGeometry(HRESULT hr)
 {
-	HRESULT hr;
 
-	Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u, &Locator::GetBuffers()->GetVertexBuffer(shapeName), &Locator::GetBuffers()->GetStride(shapeName), &Locator::GetBuffers()->GetOffset(shapeName));
+	GRAPHICS_THROW_INFO(hr);
 
-	// bind index buffer
-	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(BF->GetIndexBuffer(shapeName), DXGI_FORMAT_R16_UINT, 0u);
+	//HRESULT hr;
 
-	struct ConstantBuffer
-	{
-		dx::XMMATRIX transform;
-	};
 
-	static float angle = _angle;
-	angle += 100.0f * Locator::GetTimer()->DeltaTime();
-	ConstantBuffer cb
-	{
-		dx::XMMatrixTranspose(
-			dx::XMMatrixRotationX(angle)*
-			dx::XMMatrixRotationY(angle) *
-			dx::XMMatrixRotationZ(angle)*
-			dx::XMMatrixTranslation(x, 0.0f, 2) *
-			dx::XMMatrixPerspectiveFovLH(1.0f, 1.0f, 0.5f, 1000.0f)
-		)
-	};
+	//struct ConstantBuffer
+	//{
+	//	dx::XMMATRIX transform;
+	//};
 
-	wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-	D3D11_BUFFER_DESC cbd = {};
-	cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cbd.Usage = D3D11_USAGE_DYNAMIC;
-	cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cbd.MiscFlags = 0u;
-	cbd.ByteWidth = sizeof(cb);
-	cbd.StructureByteStride = 0u;
-	D3D11_SUBRESOURCE_DATA csd = {};
-	csd.pSysMem = &cb;
-	GRAPHICS_THROW_INFO(Locator::GetD3D()->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer));
+	//static float angle = _angle;
+	//angle += 100.0f * Locator::GetTimer()->DeltaTime();
+	//ConstantBuffer cb
+	//{
+	//	dx::XMMatrixTranspose(
+	//		dx::XMMatrixRotationX(angle)*
+	//		dx::XMMatrixRotationY(angle) *
+	//		dx::XMMatrixRotationZ(angle)*
+	//		dx::XMMatrixTranslation(x, 0.0f, 2) *
+	//		dx::XMMatrixPerspectiveFovLH(1.0f, 1.0f, 0.5f, 1000.0f)
+	//	)
+	//};
 
-	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
+	//wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+	//D3D11_BUFFER_DESC cbd = {};
+	//cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	//cbd.Usage = D3D11_USAGE_DYNAMIC;
+	//cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	//cbd.MiscFlags = 0u;
+	//cbd.ByteWidth = sizeof(cb);
+	//cbd.StructureByteStride = 0u;
+	//D3D11_SUBRESOURCE_DATA csd = {};
+	//csd.pSysMem = &cb;
+	//GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer));
 
-	// create pixel shader
-	wrl::ComPtr<ID3D11PixelShader> pPixelShader;
-	wrl::ComPtr<ID3DBlob> pBlob;
-	GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"PixelShader.cso",&pBlob ) );
-	GRAPHICS_THROW_INFO( Locator::GetD3D()->GetDevice()->CreatePixelShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pPixelShader ) );
+	//d3d->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
 
-	// bind pixel shader
-	Locator::GetD3D()->GetDeviceContext()->PSSetShader( pPixelShader.Get(),nullptr,0u );
+	//model->Render();
+
+	 //create pixel shader
+
+	//Locator::GetGraphics()->GetD3D()->GetDeviceContext()->IASetVertexBuffers(
+	//	0u, 
+	//	1u, 
+	//	&Locator::GetBuffers()->GetVertexBuffer(shapeName), 
+	//	&Locator::GetBuffers()->GetStride(shapeName), 
+	//	&Locator::GetBuffers()->GetOffset(shapeName));
+
+	//// bind index buffer
+	//Locator::GetGraphics()->GetD3D()->GetDeviceContext()->IASetIndexBuffer(
+	//	Locator::GetBuffers()->GetIndexBuffer(shapeName), 
+	//	DXGI_FORMAT_R16_UINT, 
+	//	0u);
+
+	//wrl::ComPtr<ID3D11PixelShader> pPixelShader;
+	//wrl::ComPtr<ID3DBlob> pBlob;
+	//GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"PixelShader.cso",&pBlob ) );
+	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreatePixelShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pPixelShader ) );
+
+	//// bind pixel shader
+	//d3d->GetDeviceContext()->PSSetShader( pPixelShader.Get(),nullptr,0u );
 
 	// create vertex shader
-	wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"VertexShader.cso",&pBlob ) );
-	GRAPHICS_THROW_INFO( Locator::GetD3D()->GetDevice()->CreateVertexShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pVertexShader ) );
+	//wrl::ComPtr<ID3D11VertexShader> pVertexShader;
+	//GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"VertexShader.cso",&pBlob ) );
+	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateVertexShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pVertexShader ) );
 
-	// bind vertex shader
-	Locator::GetD3D()->GetDeviceContext()->VSSetShader( pVertexShader.Get(),nullptr,0u );
+	//// bind vertex shader
+	//d3d->GetDeviceContext()->VSSetShader( pVertexShader.Get(),nullptr,0u );
 		
 
-	// input (vertex) layout (2d position only)
-	wrl::ComPtr<ID3D11InputLayout> pInputLayout;
-	const D3D11_INPUT_ELEMENT_DESC ied[] =
-	{
-		{ "SV_Position",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-		{ "Color",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
-	};
-	GRAPHICS_THROW_INFO( Locator::GetD3D()->GetDevice()->CreateInputLayout(
-		ied,(UINT)std::size( ied ),
-		pBlob->GetBufferPointer(),
-		pBlob->GetBufferSize(),
-		&pInputLayout
-	) );
+	//// input (vertex) layout (2d position only)
+	//wrl::ComPtr<ID3D11InputLayout> pInputLayout;
+	//const D3D11_INPUT_ELEMENT_DESC ied[] =
+	//{
+	//	{ "SV_Position",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
+	//	{ "Color",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
+	//};
+	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateInputLayout(
+	//	ied,(UINT)std::size( ied ),
+	//	pBlob->GetBufferPointer(),
+	//	pBlob->GetBufferSize(),
+	//	&pInputLayout
+	//) );
 
-	// bind vertex layout
-	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout( pInputLayout.Get() );
+	//// bind vertex layout
+	//d3d->GetDeviceContext()->IASetInputLayout( pInputLayout.Get() );
 
 
 	// Set primitive topology to triangle list (groups of 3 vertices)
-	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
+	//d3d->GetDeviceContext()->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
 
+	//GRAPHICS_THROW_INFO_ONLY( d3d->GetDeviceContext()->DrawIndexed( (UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName),0u,0u ) );
+	//d3d->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName), 0u);
+}
 
-	// configure viewport
-	D3D11_VIEWPORT viewport;
-	viewport.Width = 500;
-	viewport.Height = 500;
-	viewport.MinDepth = 0;
-	viewport.MaxDepth = 1;
-	viewport.TopLeftX = 0;
-	viewport.TopLeftY = 0;
-	Locator::GetD3D()->GetDeviceContext()->RSSetViewports( 1u,&viewport );
-
-
-	//GRAPHICS_THROW_INFO_ONLY( Locator::GetD3D()->GetDeviceContext()->DrawIndexed( (UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName),0u,0u ) );
-	Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName), 0u);
+D3D* Graphics::GetD3D()
+{
+	return d3d.get();
 }
 
 

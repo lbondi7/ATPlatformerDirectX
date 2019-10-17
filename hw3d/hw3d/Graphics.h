@@ -56,7 +56,9 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer( float r,float g,float b, float a) noexcept;
-	void DrawTestTriangle(float _angle, float x, float z, const std::string& shapeName);
+	void DrawGeometry(HRESULT hr); 
+	D3D* GetD3D();
+
 private:
 #ifndef NDEBUG
 	DxgiInfoManager infoManager;

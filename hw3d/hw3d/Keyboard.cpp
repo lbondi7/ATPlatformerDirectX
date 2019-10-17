@@ -12,34 +12,70 @@ void Keyboard::Initialise()
 {
 	for (int i = 0; i < 256; i++)
 	{
-		mKeysDown[i] = false;
+		keyState[i] = State::RELEASED;
+		keyPrevState[i] = State::NO_IMPUT;
 	}
 }
 
-void Keyboard::Update(const UINT &msg, const WPARAM &wParam)
+void Keyboard::Update()
+{
+	for (int i = 0; i < 256; i++)
+	{
+		keyPrevState[i] = keyState[i];
+		if (keyState[i] == State::PRESSED || keyState[i] == State::REPEATED)
+		{
+			keyState[i] = State::REPEATED;
+		}
+		else if (keyState[i] == State::RELEASED)
+		{
+			keyState[i] = State::NO_IMPUT;
+		}
+	}
+}
+
+void Keyboard::HandlerUpdate(const UINT &msg, const WPARAM &wParam)
 {
 	switch (msg)
 	{
 	case WM_KEYDOWN:
-		KeyPressed((unsigned int)wParam);
+		if (keyState[(unsigned int)wParam] == State::RELEASED || keyState[(unsigned int)wParam] == State::NO_IMPUT)
+		{
+			keyPrevState[(unsigned int)wParam] = keyState[(unsigned int)wParam];
+			keyState[(unsigned int)wParam] = State::PRESSED;
+		}
 		break;
 	case WM_KEYUP:
-		KeyReleased((unsigned int)wParam);
+		keyState[(unsigned int)wParam] = State::RELEASED;
 		break;
 	}
 }
 
-void Keyboard::KeyPressed(unsigned int key)
+bool Keyboard::IsKeyRepeated(unsigned int key)
 {
-	mKeysDown[key] = true;
+	return keyState[key] == State::REPEATED;
 }
 
-void Keyboard::KeyReleased(unsigned int key)
+bool Keyboard::IsKeyReleased(unsigned int key)
 {
-	mKeysDown[key] = false;
+	return keyState[key] == State::RELEASED;
 }
 
-bool Keyboard::IsKeyDown(unsigned int key)
+bool Keyboard::IsKeyPressed(unsigned int key)
 {
-	return mKeysDown[key];
+	return keyState[key] == State::PRESSED;
 }
+
+//void Keyboard::KeyPressed(unsigned int key)
+//{
+//	mKeysDown[key] = true;
+//}
+//
+//void Keyboard::KeyReleased(unsigned int key)
+//{
+//	mKeysDown[key] = false;
+//}
+//
+//bool Keyboard::IsKeyDown(unsigned int key)
+//{
+//	return mKeysDown[key];
+//}

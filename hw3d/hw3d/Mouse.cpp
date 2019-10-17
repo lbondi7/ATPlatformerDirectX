@@ -39,20 +39,20 @@ void Mouse::Update()
 
 void Mouse::HandlerUpdate(const UINT& msg, const LPARAM& lParam, int width, int height)
 {
-	if (msg == WM_MOUSEMOVE)
-	{
-		const POINTS mousePT = MAKEPOINTS(lParam);
-		if (mousePT.x > 0 && mousePT.x < width && mousePT.y > 0 && mousePT.y < height)
-		{
-			onScreen = true;
-			SetPos(mousePT.x, mousePT.y);
-		}
-		else
-		{
-			onScreen = false;
-			SetPos(mousePT.x, mousePT.y);
-		}
-	}
+	//if (msg == WM_MOUSEMOVE)
+	//{
+	//	const POINTS mousePT = MAKEPOINTS(lParam);
+	//	if (mousePT.x > 0 && mousePT.x < width && mousePT.y > 0 && mousePT.y < height)
+	//	{
+	//		onScreen = true;
+	//		SetPos(mousePT.x, mousePT.y);
+	//	}
+	//	else
+	//	{
+	//		onScreen = false;
+	//		SetPos(mousePT.x, mousePT.y);
+	//	}
+	//}
 
 	switch (msg)
 	{

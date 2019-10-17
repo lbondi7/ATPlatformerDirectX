@@ -26,6 +26,8 @@ bool Game::Init()
 	Locator::GetMouse()->Initialise();
 
 	window = new Window(500, 500, "hello");
+	sceneManager = std::make_unique<SceneManager>();
+	sceneManager->Init();
 
 	return true;
 }
@@ -40,6 +42,8 @@ void Game::Run()
 		//{
 		//	return *ecode;
 		//}
+		Locator::GetMouse()->Update();
+		Locator::GetKey()->Update();
 		Window::ProcessMessages();
 		Update();
 	}
@@ -47,12 +51,14 @@ void Game::Run()
 
 void Game::Update()
 {
-	window->GetGraphics()->ClearBuffer(1.0f, 1.0f, 1.0f, 0.0f);
-	window->GetGraphics()->DrawTestTriangle(70.5f, -0.5f, 10, "triangle");
-	window->GetGraphics()->DrawTestTriangle(5.0f, 0.5f, 10, "cube");
-	window->GetGraphics()->EndFrame();
-	//const float t = timer.Peek();
-	//window->SetWindowTitle("Seconds: " + std::to_string((int)t) + " - Delta Time: " + std::to_string(timer.DeltaTime()));
+	sceneManager->Update();
+	sceneManager->Render();
+	//window->GetGraphics()->ClearBuffer(1.0f, 1.0f, 1.0f, 0.0f);
+	//window->GetGraphics()->DrawTestTriangle(model, 70.5f, -0.5f, 10, "triangle");
+	//window->GetGraphics()->DrawTestTriangle(model2, 5.0f, 0.5f, 10, "cube");
+	//model->Render();
+	//model2->Render();
+	
 }
 
 void Game::Exit()
