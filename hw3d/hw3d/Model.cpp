@@ -32,7 +32,7 @@ HRESULT Model::Init()
 	cbd.StructureByteStride = 0u;
 	//D3D11_SUBRESOURCE_DATA csd = {};
 	//csd.pSysMem = &cb;
-	if (FAILED(hr = Locator::GetGraphics()->GetD3D()->GetDevice()->CreateBuffer(&cbd, 0, &m_matrixBuffer)))
+	if (FAILED(hr = Locator::GetD3D()->GetDevice()->CreateBuffer(&cbd, 0, &m_matrixBuffer)))
 	{
 		return hr;
 	}
@@ -88,7 +88,7 @@ HRESULT Model::Init()
 	unsigned int rowPitch;
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
-	std::string file = "..//Data//Simon.tga";
+	std::string file = "..//Data//" + texName + ".tga";
 	if (!LoadTarga(file.data(), height, width))
 	{
 		return false;
@@ -133,7 +133,7 @@ HRESULT Model::Init()
 	Locator::GetD3D()->GetDeviceContext()->GenerateMips(m_textureView);
 
 	m_worldMatrix = dx::XMMatrixIdentity();
-	return true;
+	return hr;
 }
 
 void Model::Update()
@@ -146,15 +146,15 @@ HRESULT Model::Render(DirectX::XMMATRIX viewMatrix)
 	UpdateConstantBuffer();
 
 	HRESULT hr;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* dataPtr;
-	unsigned int bufferNumber;
 
 	// Transpose the matrices to prepare them for the shader.
 	m_worldMatrix = dx::XMMatrixTranspose(
-		dx::XMMatrixRotationX(dx::XMVectorGetX(rotation)) *
-		dx::XMMatrixRotationY(dx::XMVectorGetY(rotation)) *
-		dx::XMMatrixRotationZ(dx::XMVectorGetZ(rotation)) *
+		dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(rotation))) *
+		dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(rotation))) *
+		dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(rotation))) *
+		dx::XMMatrixScaling(dx::XMVectorGetX(scale),
+		 dx::XMVectorGetY(scale),
+		dx::XMVectorGetZ(scale)) *
 		dx::XMMatrixTranslation(
 			dx::XMVectorGetX(position),
 			dx::XMVectorGetY(position),
@@ -383,6 +383,26 @@ float Model::GetRotZ()
 	return dx::XMVectorGetZ(rotation);
 }
 
+DirectX::XMVECTOR Model::GetScale()
+{
+	return DirectX::XMVECTOR();
+}
+
+float Model::GetScaleX()
+{
+	return dx::XMVectorGetX(scale);
+}
+
+float Model::GetScaleY()
+{
+	return dx::XMVectorGetY(scale);
+}
+
+float Model::GetScaleZ()
+{
+	return dx::XMVectorGetZ(scale);
+}
+
 void Model::SetPos(float x, float y, float z)
 {
 	position = { x, y, z, dx::XMVectorGetW(position) };
@@ -423,6 +443,26 @@ void Model::SetRotZ(float z)
 	rotation = { dx::XMVectorGetX(rotation), dx::XMVectorGetY(rotation), z, dx::XMVectorGetW(rotation) };
 }
 
+void Model::SetScale(float x, float y, float z)
+{
+	scale = { x, y, z, dx::XMVectorGetW(scale) };
+}
+
+void Model::SetScaleX(float x)
+{
+	scale = { x, dx::XMVectorGetY(scale), dx::XMVectorGetZ(scale), dx::XMVectorGetW(scale) };
+}
+
+void Model::SetScaleY(float y)
+{
+	scale = { dx::XMVectorGetX(scale), y, dx::XMVectorGetZ(scale), dx::XMVectorGetW(scale) };
+}
+
+void Model::SetScaleZ(float z)
+{
+	scale = { dx::XMVectorGetX(scale), dx::XMVectorGetY(scale), z, dx::XMVectorGetW(scale) };
+}
+
 const std::string& Model::GetGeometry()
 {
 	return shapeType;
@@ -431,4 +471,14 @@ const std::string& Model::GetGeometry()
 void Model::SetGeometry(const std::string& _shapeType)
 {
 	shapeType = _shapeType;
+}
+
+const std::string& Model::GetTexture()
+{
+	return texName;
+}
+
+void Model::SetTexture(const std::string& _shapeType)
+{
+	texName = _shapeType;
 }

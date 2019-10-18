@@ -4,6 +4,8 @@
 #include "Camera.h"
 
 #include <memory>
+#include <vector>
+#include <thread>
 
 
 class GameScene :
@@ -25,8 +27,14 @@ private:
 
 	ChangeScene changeScene = ChangeScene::NONE;
 
+	int cubeAmount = 1000;
+
 	std::unique_ptr<Model> model;
 	std::unique_ptr<Model> model2;
+	std::unique_ptr<Model> model3;
+	std::unique_ptr<Model> model4;
 	std::unique_ptr<Camera> cam;
-	//std::vector<Model> models;
+	std::vector<Model> cubes;
+	std::vector<Model> sqs;
+	std::vector<Model> tris;
 };
