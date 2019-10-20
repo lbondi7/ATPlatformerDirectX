@@ -13,7 +13,7 @@ public:
 	Buffers();
 	~Buffers() = default;
 
-	void CreateBuffer(const std::string& shapeName);
+	HRESULT CreateBuffer(const std::string& shapeName);
 
 	ID3D11Buffer*& GetVertexBuffer(const std::string& shapeName);
 	ID3D11Buffer*& GetIndexBuffer(const std::string& shapeName);
@@ -23,8 +23,8 @@ public:
 
 private:
 
-	void CreateVertexBuffer(const std::string& shapeName);
-	void CreateIndexBuffer(const std::string& shapeName);
+	HRESULT CreateVertexBuffer(const std::string& shapeName);
+	HRESULT CreateIndexBuffer(const std::string& shapeName);
 	int GetBufferNum(const std::string& shapeName);
 
 	std::vector<ID3D11Buffer*> pVertexBuffers;
@@ -32,6 +32,7 @@ private:
 	std::vector<unsigned int> indicesSize;
 	std::vector<UINT> stride;
 	std::vector<UINT> offset;
+	std::vector<int> vertexCount;
 
 	int bufferCount = 0;
 
@@ -50,10 +51,14 @@ private:
 			float v;
 		}txt;
 
+		struct
+		{
+			DirectX::XMVECTOR normal;
+		}norm;
+
 		//struct
 		//{
 		//	DirectX::XMVECTOR color;
 		//}color;
 	};
-
 };

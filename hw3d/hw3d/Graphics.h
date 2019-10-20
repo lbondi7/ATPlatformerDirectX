@@ -66,4 +66,5 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepStenView;
 	std::unique_ptr<D3D> d3d;
+	ID3D11RasterizerState* m_rasterState;;
 };

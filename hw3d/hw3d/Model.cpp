@@ -38,18 +38,26 @@ HRESULT Model::Init()
 	}
 
 	wrl::ComPtr<ID3DBlob> pBlob;
-	D3DReadFileToBlob(L"PixelShaderTex.cso", &pBlob);
-	Locator::GetD3D()->GetDevice()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader);
+	D3DReadFileToBlob(L"PixelShaderLight.cso", &pBlob);
+	if (FAILED(hr = Locator::GetD3D()->GetDevice()->CreatePixelShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pPixelShader)))
+	{
+		return hr;
+	}
 	//// create vertex shader
 //wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	D3DReadFileToBlob(L"VertexShaderTex.cso", &pBlob);
-	Locator::GetD3D()->GetDevice()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader);
+	D3DReadFileToBlob(L"VertexShaderLight.cso", &pBlob);
+	if (FAILED(hr = Locator::GetD3D()->GetDevice()->CreateVertexShader(pBlob->GetBufferPointer(), pBlob->GetBufferSize(), nullptr, &pVertexShader)))
+	{
+		return hr;
+	}
+
 	const D3D11_INPUT_ELEMENT_DESC ied[] =
 	{
 		{ "SV_Position",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
 		{ "TEXCOORD",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
+		{ "NORMAL",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
 	};
-	;
+
 	if (FAILED(hr = Locator::GetD3D()->GetDevice()->CreateInputLayout(
 		ied, (UINT)std::size(ied),
 		pBlob->GetBufferPointer(),
@@ -97,7 +105,7 @@ HRESULT Model::Init()
 	// Setup the description of the texture.
 	textureDesc.Height = height;
 	textureDesc.Width = width;
-	textureDesc.MipLevels = 0;
+	textureDesc.MipLevels = 1;
 	textureDesc.ArraySize = 1;
 	textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	textureDesc.SampleDesc.Count = 1;
@@ -132,6 +140,17 @@ HRESULT Model::Init()
 	// Generate mipmaps for this texture.
 	Locator::GetD3D()->GetDeviceContext()->GenerateMips(m_textureView);
 
+	D3D11_BUFFER_DESC lightBufferDesc = {};
+	lightBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	lightBufferDesc.ByteWidth = sizeof(LightBufferType);
+	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	lightBufferDesc.MiscFlags = 0;
+	lightBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	Locator::GetD3D()->GetDevice()->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
+
 	m_worldMatrix = dx::XMMatrixIdentity();
 	return hr;
 }
@@ -146,6 +165,8 @@ HRESULT Model::Render(DirectX::XMMATRIX viewMatrix)
 	UpdateConstantBuffer();
 
 	HRESULT hr;
+
+	LightBufferType* dataPtr2;
 
 	// Transpose the matrices to prepare them for the shader.
 	m_worldMatrix = dx::XMMatrixTranspose(
@@ -182,6 +203,26 @@ HRESULT Model::Render(DirectX::XMMATRIX viewMatrix)
 	Locator::GetD3D()->GetDeviceContext()->Unmap(m_matrixBuffer, 0);
 
 	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, &m_matrixBuffer);
+
+	Locator::GetD3D()->GetDeviceContext()->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+
+	// Get a pointer to the data in the constant buffer.
+	dataPtr2 = (LightBufferType*)mappedResource.pData;
+
+	// Copy the lighting variables into the constant buffer.
+	dataPtr2->diffuseColor = {1.0f, 0.0f, 0.0f, 1.0f};
+	dataPtr2->lightDirection = {1.0f, 0.0, 1.0, 1.0f};
+	dataPtr2->padding = 0.0f;
+
+	// Unlock the constant buffer.
+	Locator::GetD3D()->GetDeviceContext()->Unmap(m_lightBuffer, 0);
+
+	// Set the position of the light constant buffer in the pixel shader.
+	bufferNumber = 0;
+
+	// Finally set the light constant buffer in the pixel shader with the updated values.
+	Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
+
 
 	Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, &m_textureView);
 

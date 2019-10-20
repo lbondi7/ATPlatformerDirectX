@@ -75,6 +75,24 @@ Graphics::Graphics( HWND hWnd )
 	descDepStenView.Texture2D.MipSlice = 0u;
 	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
 
+	D3D11_RASTERIZER_DESC rasterDesc = {};
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_BACK;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	// Create the rasterizer state from the description we just filled out.
+	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateRasterizerState(&rasterDesc, &m_rasterState));
+
+	// Now set the rasterizer state.
+	d3d->GetDeviceContext()->RSSetState(m_rasterState);
+
 	// bind render target
 	d3d->GetDeviceContext()->OMSetRenderTargets(1u, pTargetView.GetAddressOf(), pDepStenView.Get());
 
@@ -90,29 +108,9 @@ Graphics::Graphics( HWND hWnd )
 	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
 	Locator::GetBuffers()->CreateBuffer("cube");
-	Locator::GetBuffers()->CreateBuffer("triangle");
-	Locator::GetBuffers()->CreateBuffer("square");
-
-	//rasterDesc.AntialiasedLineEnable = false;
-	//rasterDesc.CullMode = D3D11_CULL_BACK;
-	//rasterDesc.DepthBias = 0;
-	//rasterDesc.DepthBiasClamp = 0.0f;
-	//rasterDesc.DepthClipEnable = true;
-	//rasterDesc.FillMode = D3D11_FILL_SOLID;
-	//rasterDesc.FrontCounterClockwise = false;
-	//rasterDesc.MultisampleEnable = false;
-	//rasterDesc.ScissorEnable = false;
-	//rasterDesc.SlopeScaledDepthBias = 0.0f;
-
-	//// Create the rasterizer state from the description we just filled out.
-	//result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
-	//if (FAILED(result))
-	//{
-	//	return false;
-	//}
-
-	//// Now set the rasterizer state.
-	//m_deviceContext->RSSetState(m_rasterState);
+	//GRAPHICS_THROW_INFO(Locator::GetBuffers()->CreateBuffer("cube"));
+	//Locator::GetBuffers()->CreateBuffer("triangle");
+	//Locator::GetBuffers()->CreateBuffer("square");
 }
 
 void Graphics::EndFrame()

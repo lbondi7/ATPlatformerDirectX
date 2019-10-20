@@ -78,6 +78,12 @@ private:
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
 	};
+	struct LightBufferType
+	{
+		DirectX::XMVECTOR diffuseColor;
+		DirectX::XMVECTOR lightDirection;
+		float padding;  // Added extra padding so structure is a multiple of 16 for CreateBuffer function requirements.
+	};
 
 	struct TargaHeader
 	{
@@ -94,4 +100,5 @@ private:
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
+	ID3D11Buffer* m_lightBuffer;
 };
