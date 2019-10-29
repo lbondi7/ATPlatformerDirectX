@@ -6,6 +6,8 @@ class Timer;
 class Buffers;
 class D3D;
 class Graphics;
+class Texture;
+class Shader;
 
 class Locator
 {
@@ -59,6 +61,22 @@ public:
 		d3d = _d3d;
 	}
 
+	static Texture* GetTexture() {
+		return texture;
+	}
+
+	static void InitTexture(Texture* _texture) {
+		texture = _texture;
+	}
+
+	static Shader* GetShader() {
+		return shader;
+	}
+
+	static void InitShader(Shader* _shader) {
+		shader = _shader;
+	}
+
 	static Graphics* GetGraphics(){
 		return graphic;
 	}
@@ -75,8 +93,10 @@ private:
 	static Buffers* buffer;
 	static D3D* d3d;
 	static Graphics* graphic;
+	static Texture* texture;
+	static Shader* shader;
 
-	// STatic Variables
+	// Static Variables
 	static bool* exit;
 };
 

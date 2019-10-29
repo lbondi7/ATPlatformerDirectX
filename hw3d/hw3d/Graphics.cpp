@@ -2,6 +2,8 @@
 #include "dxerr.h"
 #include "Timer.h"
 #include "Locator.h"
+#include "Texture.h"
+#include "Shader.h"
 
 #include <sstream>
 #include <D3Dcompiler.h>
@@ -108,6 +110,12 @@ Graphics::Graphics( HWND hWnd )
 	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
 	Locator::GetBuffers()->CreateBuffer("cube");
+	Locator::GetBuffers()->CreateBuffer("iso");
+	Locator::GetTexture()->CreateTextures("Simon");
+	Locator::GetTexture()->CreateTextures("Scary");
+	Locator::GetTexture()->CreateTextures("MrBean");
+	Locator::GetShader()->CreateShader("basic");
+
 	//GRAPHICS_THROW_INFO(Locator::GetBuffers()->CreateBuffer("cube"));
 	//Locator::GetBuffers()->CreateBuffer("triangle");
 	//Locator::GetBuffers()->CreateBuffer("square");
@@ -139,103 +147,9 @@ void Graphics::ClearBuffer( float r,float g,float b , float a) noexcept
 	d3d->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-void Graphics::DrawGeometry(HRESULT hr)
+void Graphics::CheckHResults(HRESULT hr)
 {
-
 	GRAPHICS_THROW_INFO(hr);
-
-	//HRESULT hr;
-
-
-	//struct ConstantBuffer
-	//{
-	//	dx::XMMATRIX transform;
-	//};
-
-	//static float angle = _angle;
-	//angle += 100.0f * Locator::GetTimer()->DeltaTime();
-	//ConstantBuffer cb
-	//{
-	//	dx::XMMatrixTranspose(
-	//		dx::XMMatrixRotationX(angle)*
-	//		dx::XMMatrixRotationY(angle) *
-	//		dx::XMMatrixRotationZ(angle)*
-	//		dx::XMMatrixTranslation(x, 0.0f, 2) *
-	//		dx::XMMatrixPerspectiveFovLH(1.0f, 1.0f, 0.5f, 1000.0f)
-	//	)
-	//};
-
-	//wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
-	//D3D11_BUFFER_DESC cbd = {};
-	//cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	//cbd.Usage = D3D11_USAGE_DYNAMIC;
-	//cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	//cbd.MiscFlags = 0u;
-	//cbd.ByteWidth = sizeof(cb);
-	//cbd.StructureByteStride = 0u;
-	//D3D11_SUBRESOURCE_DATA csd = {};
-	//csd.pSysMem = &cb;
-	//GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer));
-
-	//d3d->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, pConstantBuffer.GetAddressOf());
-
-	//model->Render();
-
-	 //create pixel shader
-
-	//Locator::GetGraphics()->GetD3D()->GetDeviceContext()->IASetVertexBuffers(
-	//	0u, 
-	//	1u, 
-	//	&Locator::GetBuffers()->GetVertexBuffer(shapeName), 
-	//	&Locator::GetBuffers()->GetStride(shapeName), 
-	//	&Locator::GetBuffers()->GetOffset(shapeName));
-
-	//// bind index buffer
-	//Locator::GetGraphics()->GetD3D()->GetDeviceContext()->IASetIndexBuffer(
-	//	Locator::GetBuffers()->GetIndexBuffer(shapeName), 
-	//	DXGI_FORMAT_R16_UINT, 
-	//	0u);
-
-	//wrl::ComPtr<ID3D11PixelShader> pPixelShader;
-	//wrl::ComPtr<ID3DBlob> pBlob;
-	//GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"PixelShader.cso",&pBlob ) );
-	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreatePixelShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pPixelShader ) );
-
-	//// bind pixel shader
-	//d3d->GetDeviceContext()->PSSetShader( pPixelShader.Get(),nullptr,0u );
-
-	// create vertex shader
-	//wrl::ComPtr<ID3D11VertexShader> pVertexShader;
-	//GRAPHICS_THROW_INFO( D3DReadFileToBlob( L"VertexShader.cso",&pBlob ) );
-	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateVertexShader( pBlob->GetBufferPointer(),pBlob->GetBufferSize(),nullptr,&pVertexShader ) );
-
-	//// bind vertex shader
-	//d3d->GetDeviceContext()->VSSetShader( pVertexShader.Get(),nullptr,0u );
-		
-
-	//// input (vertex) layout (2d position only)
-	//wrl::ComPtr<ID3D11InputLayout> pInputLayout;
-	//const D3D11_INPUT_ELEMENT_DESC ied[] =
-	//{
-	//	{ "SV_Position",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-	//	{ "Color",0,DXGI_FORMAT_R32G32B32A32_FLOAT,0,D3D11_APPEND_ALIGNED_ELEMENT,D3D11_INPUT_PER_VERTEX_DATA,0 },
-	//};
-	//GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateInputLayout(
-	//	ied,(UINT)std::size( ied ),
-	//	pBlob->GetBufferPointer(),
-	//	pBlob->GetBufferSize(),
-	//	&pInputLayout
-	//) );
-
-	//// bind vertex layout
-	//d3d->GetDeviceContext()->IASetInputLayout( pInputLayout.Get() );
-
-
-	// Set primitive topology to triangle list (groups of 3 vertices)
-	//d3d->GetDeviceContext()->IASetPrimitiveTopology( D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST );
-
-	//GRAPHICS_THROW_INFO_ONLY( d3d->GetDeviceContext()->DrawIndexed( (UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName),0u,0u ) );
-	//d3d->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeName), 0u);
 }
 
 D3D* Graphics::GetD3D()

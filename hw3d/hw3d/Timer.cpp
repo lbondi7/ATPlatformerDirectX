@@ -21,7 +21,7 @@ float Timer::Peek() const
 
 float Timer::DeltaTime()
 {
-	return deltaTime.count() / 1000.0f;
+	return deltaTime.count();
 }
 
 void Timer::SetDeltaTime()

@@ -39,7 +39,7 @@ void SceneManager::Render()
 	if (currentScene == SceneManager::CurrentScene::MENU)
 		Locator::GetGraphics()->ClearBuffer(1.0f, 0.0f, 0.0f, 1.0f);
 	else if (currentScene == SceneManager::CurrentScene::GAME)
-		Locator::GetGraphics()->ClearBuffer(0.0f, 0.0f, !.0f, 1.0f);
+		Locator::GetGraphics()->ClearBuffer(0.0f, 0.0f, 1.0f, 1.0f);
 
 	activeScene->Render();
 

@@ -8,6 +8,7 @@ public:
 	Camera();
 	~Camera();
 
+	void Update();
 	void Render();
 
 
@@ -40,5 +41,8 @@ private:
 	DirectX::XMMATRIX mViewMatrix;
 	DirectX::XMVECTOR position;
 	DirectX::XMVECTOR rotation;
+	DirectX::XMMATRIX rotationMatrix;
+	DirectX::XMVECTOR up;
+	DirectX::XMVECTOR lookAt;
 };
 

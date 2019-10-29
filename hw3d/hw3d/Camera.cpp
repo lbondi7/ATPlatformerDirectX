@@ -12,15 +12,9 @@ Camera::~Camera()
 {
 }
 
-void Camera::Render()
+void Camera::Update()
 {
-	dx::XMVECTOR up, position, lookAt;
-	float yaw, pitch, roll;
-	dx::XMMATRIX rotationMatrix;
-
-
-	// Setup the vector that points upwards.
-	up = {0.0f, 1.0f, 0.0f, 1.0f};
+	up = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 	// Setup the position of the camera in the world.
 	position = GetPos();
@@ -28,13 +22,11 @@ void Camera::Render()
 	// Setup where the camera is looking by default.
 	lookAt = { 0.0f, 0.0f, 1.0f, 1.0f };
 
-	// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-	pitch = GetRotX() * 0.0174532925f;
-	yaw = GetRotY() * 0.0174532925f;
-	roll = GetRotZ() * 0.0174532925f;
-
 	// Create the rotation matrix from the yaw, pitch, and roll values.
-	rotationMatrix = dx::XMMatrixRotationRollPitchYaw(yaw, pitch, roll);
+	rotationMatrix = dx::XMMatrixRotationRollPitchYaw(
+		GetRotY() * 0.0174532925f,
+		GetRotX() * 0.0174532925f,
+		GetRotZ() * 0.0174532925f);
 
 
 	lookAt = dx::XMVector4Transform(lookAt, rotationMatrix);
@@ -44,10 +36,48 @@ void Camera::Render()
 	//D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
 
 	// Translate the rotated camera position to the location of the viewer.
-	lookAt = dx::XMVectorAdd(position, lookAt);
+	lookAt = dx::XMVectorAdd(GetPos(), lookAt);
 
 
-	mViewMatrix = dx::XMMatrixLookAtLH(position, lookAt, up);
+	mViewMatrix = dx::XMMatrixLookAtLH(GetPos(), lookAt, up);
+}
+
+void Camera::Render()
+{
+	//dx::XMVECTOR up, position, lookAt;
+	//float yaw, pitch, roll;
+	//dx::XMMATRIX rotationMatrix;
+
+
+	//// Setup the vector that points upwards.
+	//up = {0.0f, 1.0f, 0.0f, 1.0f};
+
+	//// Setup the position of the camera in the world.
+	//position = GetPos();
+
+	//// Setup where the camera is looking by default.
+	//lookAt = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+	//// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
+	//pitch = GetRotX() * 0.0174532925f;
+	//yaw = GetRotY() * 0.0174532925f;
+	//roll = GetRotZ() * 0.0174532925f;
+
+	//// Create the rotation matrix from the yaw, pitch, and roll values.
+	//rotationMatrix = dx::XMMatrixRotationRollPitchYaw(yaw, pitch, roll);
+
+
+	//lookAt = dx::XMVector4Transform(lookAt, rotationMatrix);
+	//up = dx::XMVector4Transform(up, rotationMatrix);
+	//// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+	////D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
+	////D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
+
+	//// Translate the rotated camera position to the location of the viewer.
+	//lookAt = dx::XMVectorAdd(position, lookAt);
+
+
+	//mViewMatrix = dx::XMMatrixLookAtLH(position, lookAt, up);
 	// Finally create the view matrix from the three updated vectors.
 	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 }

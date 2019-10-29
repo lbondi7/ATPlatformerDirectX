@@ -56,7 +56,7 @@ public:
 	~Graphics() = default;
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b, float a) noexcept;
-	void DrawGeometry(HRESULT hr);
+	void CheckHResults(HRESULT hr);
 	D3D* GetD3D();
 
 private:

@@ -17,10 +17,6 @@ public:
 	void Update();
 	HRESULT Render(DirectX::XMMATRIX viewMatrix);
 
-	void UpdateConstantBuffer();
-
-	bool LoadTarga(char* filename, int& height, int& width);
-
 	DirectX::XMVECTOR GetPos();
 	float GetPosX();
 	float GetPosY();
@@ -50,15 +46,18 @@ public:
 	void SetScaleY(float y);
 	void SetScaleZ(float z);
 
-	const std::string& GetGeometry();
-	void SetGeometry(const std::string& _shapeType);
-	const std::string& GetTexture();
-	void SetTexture(const std::string& _shapeType);
+	const std::string& ModelType();
+	void ModelType(const std::string& _shapeType);
+	const std::string& Texture();
+	void Texture(const std::string& _shapeType);
+	const std::string& Shader();
+	void Shader(const std::string& _shapeType);
 
 private:
 
-	std::string shapeType;
-	std::string texName = "";
+	std::string mModelType = "iso";
+	std::string mTexure = "Simon";
+	std::string mShader = "basic";
 
 	float x;
 	float y;
@@ -101,4 +100,5 @@ private:
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
 	ID3D11Buffer* m_lightBuffer;
+	LightBufferType* dataPtr2;
 };

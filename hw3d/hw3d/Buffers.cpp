@@ -20,6 +20,7 @@ Buffers::Buffers()
 
 HRESULT Buffers::CreateBuffer(const std::string& shapeName)
 {
+	bool objs = true;
 	HRESULT hr;
 	shapes[shapeName] = bufferCount;
 	pVertexBuffers.resize(shapes.size());
@@ -29,9 +30,19 @@ HRESULT Buffers::CreateBuffer(const std::string& shapeName)
 	indicesSize.resize(shapes.size());
 	vertexCount.resize(shapes.size());
 	//create Vertex Buffer
-	if (FAILED(hr = CreateVertexBuffer(shapeName)))
+	if (objs)
 	{
-		return hr;
+		if (FAILED(hr = CreateVertexBuffer(shapeName)))
+		{
+			return hr;
+		}
+	}
+	else if (!objs)
+	{
+		if (FAILED(hr = LoadModel(shapeName)))
+		{
+			return hr;
+		}
 	}
 	// create Index Buffer
 	if (FAILED(hr = CreateIndexBuffer(shapeName)))
@@ -43,6 +54,73 @@ HRESULT Buffers::CreateBuffer(const std::string& shapeName)
 	//// bind index buffer
 	//d3d->GetDeviceContext()->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 	return hr;
+}
+
+HRESULT Buffers::LoadModel(const std::string& shapeName)
+{
+	std::ifstream fin;
+	char input;
+	int i;
+
+
+	// Open the model file.
+	fin.open("..//Data//" + shapeName + ".txt");
+
+	// If it could not open the file then exit.
+	if (fin.fail())
+	{
+		return false;
+	}
+
+	// Read up to the value of vertex count.
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+
+	// Read in the vertex count.
+	fin >> vertexCount[shapes[shapeName]];
+
+	// Read up to the beginning of the data.
+	fin.get(input);
+	while (input != ':')
+	{
+		fin.get(input);
+	}
+	fin.get(input);
+	fin.get(input);
+
+	VertexType* vertices = new VertexType[vertexCount[shapes[shapeName]]];
+
+	float x, y, z, u, v, nx, ny, nz;
+	// Read in the vertex data.
+	for (i = 0; i < vertexCount[shapes[shapeName]]; i++)
+	{
+		fin >> x >>  y >> z;
+		fin >> u >> v;
+		fin >> nx >> ny >> nz;
+		vertices[i] = { x, y, z, 0.0f, u,v, nx, ny, nz, 0.0f };
+		//vertices[i] = { DirectX::XMFLOAT3(x, y, z) , DirectX::XMFLOAT2(u, v), DirectX::XMFLOAT3(nx, ny, nz) };
+	}
+
+	// Close the model file.
+	fin.close();
+
+	D3D11_BUFFER_DESC vbd = {};
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.Usage = D3D11_USAGE_DEFAULT;
+	vbd.CPUAccessFlags = 0u;
+	vbd.MiscFlags = 0u;
+	vbd.ByteWidth = sizeof(VertexType) * vertexCount[shapes[shapeName]];
+	vbd.StructureByteStride = sizeof(VertexType);
+	D3D11_SUBRESOURCE_DATA vsd = {};
+	vsd.pSysMem = vertices;
+
+	stride[shapes[shapeName]] = sizeof(VertexType);
+	offset[shapes[shapeName]] = 0u;
+
+	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &pVertexBuffers[shapes[shapeName]]);
 }
 
 HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
@@ -60,7 +138,8 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 	////auto colour = shapeJson["Vertecies"]["Colour"][std::to_string(i)];
 	//auto tex = shapeJson["Vertecies"]["Texture"][std::to_string(i)];
 	//auto norm = shapeJson["Vertecies"]["Normal"][std::to_string(i)];
-	//vertices[i] = { vertex[0],vertex[1],vertex[2],0.0f,tex[0],tex[1],norm[0],norm[1],norm[2],0.0f };
+
+	//vertices[i] = { vertex[0],vertex[1],vertex[2], 0.0f, tex[0],tex[1], norm[0],norm[1],norm[2], 0.0f };
 	//}
 
 	struct Faces
@@ -71,7 +150,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 	};
 
 	std::vector<DirectX::XMVECTOR> vert;
-	std::vector<DirectX::XMVECTOR> texs;
+	std::vector<DirectX::XMFLOAT2> texs;
 	std::vector<DirectX::XMVECTOR> norm;
 	std::vector<std::vector<Faces>> faces;
 	std::vector<Faces> face;
@@ -100,7 +179,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 				case ' ':
 				{
 					file >> x >> y >> z;
-					vert.push_back({ x, y, z });
+					vert.push_back({ x, y, z});
 					break;
 				}
 				case 't':
@@ -110,7 +189,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 						break;
 
 					file >> x >> y;
-					texs.push_back({ x, y });
+					texs.push_back({ 1 - x, 1 - y });
 					break;
 				}
 				case 'n':
@@ -120,7 +199,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 						break;
 
 					file >> x >> y >> z;
-					norm.push_back({ x, y, z });
+					norm.push_back({ x, y, z});
 					break;
 				}
 				}
@@ -141,7 +220,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 					}
 					faces.push_back(face);
 					face.clear();
-					face.reserve(3);
+					face.reserve(2);
 				}
 			}
 		}
@@ -154,6 +233,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 	float vIn;
 	float vtIn;
 	float vnIn;
+
 	for (size_t i = 0; i < faces.size(); i++)
 	{
 		for (size_t j = 0; j < faces[i].size(); j++)
@@ -161,12 +241,36 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 			vIn = faces[i][j].vIndex - 1;
 			vtIn = faces[i][j].tIndex - 1;
 			vnIn = faces[i][j].nIndex - 1;
-			vertices[l] = {DirectX::XMVectorGetX(vert[vIn]), DirectX::XMVectorGetY(vert[vIn]), DirectX::XMVectorGetZ(vert[vIn]),
-			DirectX::XMVectorGetX(texs[vtIn]), DirectX::XMVectorGetY(texs[vtIn]), 
-			DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn])};
+
+			vertices[l] = { DirectX::XMVectorGetX(vert[vIn]), DirectX::XMVectorGetY(vert[vIn]), DirectX::XMVectorGetZ(vert[vIn]), 0.0f,
+				texs[vtIn].x, texs[vtIn].y,
+				 DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn]), 0.0f};
 			++l;
 		}
 	}
+
+	//for (size_t i = 0; i < vertexCount[shapes[shapeName]]; i += 3)
+	//{
+	//	auto v0 = vertices[i];
+	//	auto v1 = vertices[i + 1];
+	//	auto v2 = vertices[i + 2];
+	//	const auto p0 = DirectX::XMLoadFloat3(&v0.pos.position);
+	//	const auto p1 = DirectX::XMLoadFloat3(&v1.pos.position);
+	//	const auto p2 = DirectX::XMLoadFloat3(&v2.pos.position);
+	//	const auto n = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(p0, p1), DirectX::XMVectorSubtract(p0, p2)));
+	//	DirectX::XMStoreFloat3(&v0.norm.normal, n);
+	//	DirectX::XMStoreFloat3(&v1.norm.normal, n);
+	//	DirectX::XMStoreFloat3(&v2.norm.normal, n);
+	//	vertices[i] = { vertices[i].pos,
+	//		vertices[i].txt.texs,
+	//       DirectX::XMFLOAT3(v0.norm.normal.z, v0.norm.normal.y, v0.norm.normal.x) };
+	//	vertices[i + 1] = { vertices[i + 1].pos,
+	//        vertices[i  + 1].txt.texs,
+	//        DirectX::XMFLOAT3(v1.norm.normal.z, v1.norm.normal.y, v1.norm.normal.x) };
+	//	vertices[i + 2] = { vertices[i + 2].pos,
+	//        vertices[i + 2].txt.texs,
+	//        DirectX::XMFLOAT3(v2.norm.normal.z, v2.norm.normal.y, v2.norm.normal.x) };
+	//}
 
 	D3D11_BUFFER_DESC vbd = {};
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;

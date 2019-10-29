@@ -27,14 +27,8 @@ private:
 
 	ChangeScene changeScene = ChangeScene::NONE;
 
-	int cubeAmount = 1000;
+	int mObjNum = 1;
 
-	std::unique_ptr<Model> model;
-	std::unique_ptr<Model> model2;
-	std::unique_ptr<Model> model3;
-	std::unique_ptr<Model> model4;
-	std::unique_ptr<Camera> cam;
-	std::vector<Model> cubes;
-	std::vector<Model> sqs;
-	std::vector<Model> tris;
+	std::unique_ptr<Camera> mCam;
+	std::vector<Model> mGObjects;
 };

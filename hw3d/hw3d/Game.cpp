@@ -5,6 +5,8 @@
 #include "Timer.h"
 #include "Buffers.h"
 #include "D3D.h"
+#include "Texture.h"
+#include "Shader.h"
 
 #include <iomanip>
 #include <thread>
@@ -20,6 +22,8 @@ bool Game::Init()
 	Locator::InitMouse(new Mouse());
 	Locator::InitTimer(new Timer());
 	Locator::InitBuffers(new Buffers());
+	Locator::InitTexture(new Texture());
+	Locator::InitShader(new Shader());
 
 	Locator::InitExitBool();
 	Locator::GetKey()->Initialise();
