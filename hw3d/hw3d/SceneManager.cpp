@@ -6,8 +6,6 @@
 
 bool SceneManager::Init()
 {
-
-
 	activeScene = std::make_unique<MenuScene>();
 	activeScene->Init();
 
@@ -22,12 +20,14 @@ void SceneManager::Update()
 		activeScene.reset();
 		activeScene = std::make_unique<MenuScene>();
 		activeScene->Init();
+		activeScene->Update();
 		currentScene = SceneManager::CurrentScene::MENU;
 		break;
 	case Scene::CurrentScene::GAME:
 		activeScene.reset();
 		activeScene = std::make_unique<GameScene>();
 		activeScene->Init();
+		activeScene->Update();
 		currentScene = SceneManager::CurrentScene::GAME;
 		break;
 	}

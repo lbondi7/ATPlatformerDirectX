@@ -56,16 +56,40 @@ HRESULT Model::Init()
 void Model::Update()
 {
 	m_worldMatrix = dx::XMMatrixTranspose(
-		dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(rotation))) *
-		dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(rotation))) *
-		dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(rotation))) *
-		dx::XMMatrixScaling(dx::XMVectorGetX(scale),
-			dx::XMVectorGetY(scale),
-			dx::XMVectorGetZ(scale)) *
+		dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(transform.GetRot()))) *
+		dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(transform.GetRot()))) *
+		dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(transform.GetRot()))) *
+		dx::XMMatrixScaling(dx::XMVectorGetX(transform.GetScale()),
+			dx::XMVectorGetY(transform.GetScale()),
+			dx::XMVectorGetZ(transform.GetScale())) *
 		dx::XMMatrixTranslation(
-			dx::XMVectorGetX(position),
-			dx::XMVectorGetY(position),
-			dx::XMVectorGetZ(position)));
+			dx::XMVectorGetX(transform.GetPos()),
+			dx::XMVectorGetY(transform.GetPos()),
+			dx::XMVectorGetZ(transform.GetPos())));
+
+	//m_worldMatrix = dx::XMMatrixTranspose(
+	//	dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(transform.rotation))) *
+	//	dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(transform.rotation))) *
+	//	dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(transform.rotation))) *
+	//	dx::XMMatrixScaling(dx::XMVectorGetX(transform.scale),
+	//		dx::XMVectorGetY(transform.scale),
+	//		dx::XMVectorGetZ(transform.scale)) *
+	//	dx::XMMatrixTranslation(
+	//		dx::XMVectorGetX(transform.position),
+	//		dx::XMVectorGetY(transform.position),
+	//		dx::XMVectorGetZ(transform.position)));
+	//
+	//m_worldMatrix = dx::XMMatrixTranspose(
+	//	dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(rotation))) *
+	//	dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(rotation))) *
+	//	dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(rotation))) *
+	//	dx::XMMatrixScaling(dx::XMVectorGetX(scale),
+	//		dx::XMVectorGetY(scale),
+	//		dx::XMVectorGetZ(scale)) *
+	//	dx::XMMatrixTranslation(
+	//		dx::XMVectorGetX(position),
+	//		dx::XMVectorGetY(position),
+	//		dx::XMVectorGetZ(position)));
 }
 
 HRESULT Model::Render(DirectX::XMMATRIX viewMatrix)
@@ -140,6 +164,11 @@ HRESULT Model::Render(DirectX::XMMATRIX viewMatrix)
 
 
 	return hr;
+}
+
+Transform& Model::GetTransform()
+{
+	return transform;
 }
 
 DirectX::XMVECTOR Model::GetPos()
@@ -260,6 +289,11 @@ void Model::SetScaleY(float y)
 void Model::SetScaleZ(float z)
 {
 	scale = { dx::XMVectorGetX(scale), dx::XMVectorGetY(scale), z, dx::XMVectorGetW(scale) };
+}
+
+const std::string& Model::ModelType()
+{
+	return mModelType;
 }
 
 void Model::ModelType(const std::string& _shapeType)

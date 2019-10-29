@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Transform.h"
+
 #include <string>
 #include <DirectXMath.h>
 #include <wrl.h>
@@ -16,6 +18,8 @@ public:
 	HRESULT Init();
 	void Update();
 	HRESULT Render(DirectX::XMMATRIX viewMatrix);
+
+	Transform& GetTransform();
 
 	DirectX::XMVECTOR GetPos();
 	float GetPosX();
@@ -65,9 +69,6 @@ private:
 	DirectX::XMVECTOR position;
 	DirectX::XMVECTOR rotation;
 	DirectX::XMVECTOR scale = {1, 1, 1, 0};
-	Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-	Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
 	ID3D11SamplerState* m_sampleState;
 	DirectX::XMMATRIX m_worldMatrix;
 	ID3D11Buffer* m_matrixBuffer;
@@ -84,21 +85,12 @@ private:
 		float padding;  // Added extra padding so structure is a multiple of 16 for CreateBuffer function requirements.
 	};
 
-	struct TargaHeader
-	{
-		unsigned char data1[12];
-		unsigned short width;
-		unsigned short height;
-		unsigned char bpp;
-		unsigned char data2;
-	};
-	unsigned char* m_targaData;
-	ID3D11Texture2D* m_texture;
-	ID3D11ShaderResourceView* m_textureView;
-
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
 	ID3D11Buffer* m_lightBuffer;
 	LightBufferType* dataPtr2;
+
+
+	Transform transform;
 };

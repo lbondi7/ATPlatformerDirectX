@@ -28,8 +28,8 @@ bool GameScene::Init()
 		Model mod;
 		mod.ModelType("cube");
 		mod.Texture(texName[2]);
-		mod.SetPos(0, 0, 2);
-		mod.SetScale(1, 1, 1);
+		mod.GetTransform().SetPos(0, 0, 2);
+		mod.GetTransform().SetScale(1, 1, 1);
 		mGObjects.push_back(mod);
 		mGObjects[i].Init();
 	}
@@ -83,7 +83,7 @@ Scene::CurrentScene GameScene::Update()
 
 	for (int i = 0; i < mObjNum; i++)
 	{
-		mGObjects[i].SetRotY(30* Locator::GetTimer()->Peek());
+		mGObjects[i].GetTransform().SetRotY(30* Locator::GetTimer()->Peek());
 		mGObjects[i].Update();
 	}
 
