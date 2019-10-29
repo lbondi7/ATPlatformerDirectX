@@ -7,15 +7,13 @@
 #include <map>
 #include <string>
 
-class Buffers
+class Vertices
 {
 public:
-	Buffers();
-	~Buffers() = default;
+	Vertices();
+	~Vertices() = default;
 
 	HRESULT CreateBuffer(const std::string& shapeName);
-
-	HRESULT LoadModel(const std::string& filename);
 
 	ID3D11Buffer*& GetVertexBuffer(const std::string& shapeName);
 	ID3D11Buffer*& GetIndexBuffer(const std::string& shapeName);

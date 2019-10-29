@@ -1,4 +1,4 @@
-#include "Buffers.h"
+#include "Vertices.h"
 #include "Locator.h"
 #include "D3D.h"
 
@@ -13,14 +13,13 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
-Buffers::Buffers()
+Vertices::Vertices()
 {
 	//shapes["cube"] = 0;
 }
 
-HRESULT Buffers::CreateBuffer(const std::string& shapeName)
+HRESULT Vertices::CreateBuffer(const std::string& shapeName)
 {
-	bool objs = true;
 	HRESULT hr;
 	shapes[shapeName] = bufferCount;
 	pVertexBuffers.resize(shapes.size());
@@ -30,20 +29,11 @@ HRESULT Buffers::CreateBuffer(const std::string& shapeName)
 	indicesSize.resize(shapes.size());
 	vertexCount.resize(shapes.size());
 	//create Vertex Buffer
-	if (objs)
+	if (FAILED(hr = CreateVertexBuffer(shapeName)))
 	{
-		if (FAILED(hr = CreateVertexBuffer(shapeName)))
-		{
-			return hr;
-		}
+		return hr;
 	}
-	else if (!objs)
-	{
-		if (FAILED(hr = LoadModel(shapeName)))
-		{
-			return hr;
-		}
-	}
+	
 	// create Index Buffer
 	if (FAILED(hr = CreateIndexBuffer(shapeName)))
 	{
@@ -56,74 +46,7 @@ HRESULT Buffers::CreateBuffer(const std::string& shapeName)
 	return hr;
 }
 
-HRESULT Buffers::LoadModel(const std::string& shapeName)
-{
-	std::ifstream fin;
-	char input;
-	int i;
-
-
-	// Open the model file.
-	fin.open("..//Data//" + shapeName + ".txt");
-
-	// If it could not open the file then exit.
-	if (fin.fail())
-	{
-		return false;
-	}
-
-	// Read up to the value of vertex count.
-	fin.get(input);
-	while (input != ':')
-	{
-		fin.get(input);
-	}
-
-	// Read in the vertex count.
-	fin >> vertexCount[shapes[shapeName]];
-
-	// Read up to the beginning of the data.
-	fin.get(input);
-	while (input != ':')
-	{
-		fin.get(input);
-	}
-	fin.get(input);
-	fin.get(input);
-
-	VertexType* vertices = new VertexType[vertexCount[shapes[shapeName]]];
-
-	float x, y, z, u, v, nx, ny, nz;
-	// Read in the vertex data.
-	for (i = 0; i < vertexCount[shapes[shapeName]]; i++)
-	{
-		fin >> x >>  y >> z;
-		fin >> u >> v;
-		fin >> nx >> ny >> nz;
-		vertices[i] = { x, y, z, 0.0f, u,v, nx, ny, nz, 0.0f };
-		//vertices[i] = { DirectX::XMFLOAT3(x, y, z) , DirectX::XMFLOAT2(u, v), DirectX::XMFLOAT3(nx, ny, nz) };
-	}
-
-	// Close the model file.
-	fin.close();
-
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.Usage = D3D11_USAGE_DEFAULT;
-	vbd.CPUAccessFlags = 0u;
-	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = sizeof(VertexType) * vertexCount[shapes[shapeName]];
-	vbd.StructureByteStride = sizeof(VertexType);
-	D3D11_SUBRESOURCE_DATA vsd = {};
-	vsd.pSysMem = vertices;
-
-	stride[shapes[shapeName]] = sizeof(VertexType);
-	offset[shapes[shapeName]] = 0u;
-
-	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &pVertexBuffers[shapes[shapeName]]);
-}
-
-HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
+HRESULT Vertices::CreateVertexBuffer(const std::string& shapeName)
 {
 	vertexCount[shapes[shapeName]] = 0;
 
@@ -167,7 +90,6 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 		float x, y, z;
 		while (!file.eof())
 		{
-
 			file.get(lineChar);
 
 			skip = false;
@@ -288,7 +210,7 @@ HRESULT Buffers::CreateVertexBuffer(const std::string& shapeName)
 	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &pVertexBuffers[shapes[shapeName]]);
 }
 
-HRESULT Buffers::CreateIndexBuffer(const std::string& shapeName)
+HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
 {
 	unsigned short* indices = new unsigned short[vertexCount[shapes[shapeName]]];
 
@@ -311,33 +233,33 @@ HRESULT Buffers::CreateIndexBuffer(const std::string& shapeName)
 	return Locator::GetD3D()->GetDevice()->CreateBuffer(&ibd, &isd, &pIndexBuffers[shapes[shapeName]]);
 }
 
-int Buffers::GetBufferNum(const std::string& shapeName)
+int Vertices::GetBufferNum(const std::string& shapeName)
 {
 	int bufNum = shapes[shapeName];
 	return bufNum;
 }
 
-ID3D11Buffer*& Buffers::GetVertexBuffer(const std::string& shapeName)
+ID3D11Buffer*& Vertices::GetVertexBuffer(const std::string& shapeName)
 {
 	return pVertexBuffers[GetBufferNum(shapeName)];
 }
 
-ID3D11Buffer*& Buffers::GetIndexBuffer(const std::string& shapeName)
+ID3D11Buffer*& Vertices::GetIndexBuffer(const std::string& shapeName)
 {
 	return pIndexBuffers[GetBufferNum(shapeName)];
 }
 
-const UINT& Buffers::GetStride(const std::string& shapeName)
+const UINT& Vertices::GetStride(const std::string& shapeName)
 {
 	return stride[GetBufferNum(shapeName)];
 }
 
-const UINT& Buffers::GetOffset(const std::string& shapeName)
+const UINT& Vertices::GetOffset(const std::string& shapeName)
 {
 	return offset[GetBufferNum(shapeName)];
 }
 
-unsigned int Buffers::GetIndeciesSize(const std::string& shapeName)
+unsigned int Vertices::GetIndeciesSize(const std::string& shapeName)
 {
 	return indicesSize[GetBufferNum(shapeName)];
 }

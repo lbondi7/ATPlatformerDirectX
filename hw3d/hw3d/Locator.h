@@ -3,11 +3,13 @@
 class Keyboard;
 class Mouse;
 class Timer;
-class Buffers;
+class Vertices;
 class D3D;
 class Graphics;
 class Texture;
 class Shader;
+class Light;
+class Matrices;
 
 class Locator
 {
@@ -45,12 +47,12 @@ public:
 		*exit = false;
 	}
 
-	static Buffers* GetBuffers() {
-		return buffer;
+	static Vertices* GetVertices() {
+		return vertices;
 	}
 
-	static void InitBuffers(Buffers* _buffer) {
-		buffer = _buffer;
+	static void InitVertices(Vertices* _buffer) {
+		vertices = _buffer;
 	}
 
 	static D3D* GetD3D() {
@@ -77,6 +79,22 @@ public:
 		shader = _shader;
 	}
 
+	static Light* GetLight() {
+		return light;
+	}
+
+	static void InitMatrices(Matrices* _matrices) {
+		matrices = _matrices;
+	}
+
+	static Matrices* GetMatrices() {
+		return matrices;
+	}
+
+	static void InitLight(Light* _light) {
+		light = _light;
+	}
+
 	static Graphics* GetGraphics(){
 		return graphic;
 	}
@@ -90,11 +108,13 @@ private:
 	static Keyboard* key;
 	static Mouse* mouse;
 	static Timer* timer;
-	static Buffers* buffer;
+	static Vertices* vertices;
 	static D3D* d3d;
 	static Graphics* graphic;
 	static Texture* texture;
 	static Shader* shader;
+	static Light* light;
+	static Matrices* matrices;
 
 	// Static Variables
 	static bool* exit;

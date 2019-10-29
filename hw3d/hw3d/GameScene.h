@@ -27,7 +27,7 @@ private:
 
 	ChangeScene changeScene = ChangeScene::NONE;
 
-	int mObjNum = 1;
+	int mObjNum = 2;
 
 	std::unique_ptr<Camera> mCam;
 	std::vector<Model> mGObjects;

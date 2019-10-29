@@ -55,6 +55,9 @@
     <Filter Include="Header Files\Scene">
       <UniqueIdentifier>{2ec4aa52-5b00-4175-b868-ac5d8c8413f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Graphics\Buffers">
+      <UniqueIdentifier>{129bced5-e713-4a80-b0d1-f78b6e119b4b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Keyboard.h">
@@ -102,17 +105,8 @@
     <ClInclude Include="D3D.h">
       <Filter>Header Files\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Buffers.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files\Scene</Filter>
@@ -128,6 +122,21 @@
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertices.h">
+      <Filter>Header Files\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Header Files\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.h">
+      <Filter>Header Files\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Matrices.h">
+      <Filter>Header Files\Graphics\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +176,6 @@
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Game\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Buffers.cpp">
-      <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="D3D.cpp">
       <Filter>Source Files\DirectX</Filter>
     </ClCompile>
@@ -193,6 +199,15 @@
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertices.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrices.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

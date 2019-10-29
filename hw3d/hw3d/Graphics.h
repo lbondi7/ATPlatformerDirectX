@@ -3,7 +3,7 @@
 #include "LewisException.h"
 #include "DxgiInfoManager.h"
 #include "D3D.h"
-#include "Buffers.h"
+#include "Vertices.h"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -54,6 +54,11 @@ public:
 	Graphics(const Graphics&) = delete;
 	Graphics& operator=(const Graphics&) = delete;
 	~Graphics() = default;
+	void Render(DirectX::XMMATRIX wMtrx,
+		DirectX::XMMATRIX vMtrx,
+		const std::string& model,
+		const std::string& texture,
+		const std::string& shader);
 	void EndFrame();
 	void ClearBuffer(float r, float g, float b, float a) noexcept;
 	void CheckHResults(HRESULT hr);
@@ -66,5 +71,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTargetView;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepStenView;
 	std::unique_ptr<D3D> d3d;
-	ID3D11RasterizerState* m_rasterState;;
+	ID3D11RasterizerState* m_rasterState;
+	DirectX::XMMATRIX projMatrix;
 };

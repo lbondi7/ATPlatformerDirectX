@@ -4,6 +4,8 @@
 #include "Locator.h"
 #include "Texture.h"
 #include "Shader.h"
+#include "Light.h"
+#include "Matrices.h"
 
 #include <sstream>
 #include <D3Dcompiler.h>
@@ -12,7 +14,7 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
-#define BF Locator::GetBuffers()
+#define BF Locator::GetVertices()
 
 #pragma comment(lib,"d3d11.lib")
 #pragma comment(lib,"D3DCompiler.lib")
@@ -78,7 +80,7 @@ Graphics::Graphics( HWND hWnd )
 	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
 
 	D3D11_RASTERIZER_DESC rasterDesc = {};
-	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.AntialiasedLineEnable = true;
 	rasterDesc.CullMode = D3D11_CULL_BACK;
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
@@ -109,16 +111,50 @@ Graphics::Graphics( HWND hWnd )
 	viewport.TopLeftY = 0;
 	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
-	Locator::GetBuffers()->CreateBuffer("cube");
-	Locator::GetBuffers()->CreateBuffer("iso");
+	Locator::GetVertices()->CreateBuffer("cube");
+	Locator::GetVertices()->CreateBuffer("iso");
 	Locator::GetTexture()->CreateTextures("Simon");
 	Locator::GetTexture()->CreateTextures("Scary");
 	Locator::GetTexture()->CreateTextures("MrBean");
 	Locator::GetShader()->CreateShader("basic");
+	Locator::GetLight()->CreateBuffer();
+	Locator::GetMatrices()->CreateBuffer();
+}
 
-	//GRAPHICS_THROW_INFO(Locator::GetBuffers()->CreateBuffer("cube"));
-	//Locator::GetBuffers()->CreateBuffer("triangle");
-	//Locator::GetBuffers()->CreateBuffer("square");
+void Graphics::Render(dx::XMMATRIX wMtrx, dx::XMMATRIX vMtrx, const std::string& model, const std::string& texture, const std::string& shader)
+{
+	projMatrix = dx::XMMatrixTranspose(d3d->GetProjMatrix());
+	CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, vMtrx, projMatrix));
+
+	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, &Locator::GetMatrices()->GetBuffer());
+
+	CheckHResults(Locator::GetLight()->MapResource());
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(0, 1, &Locator::GetLight()->GetBuffer());
+
+	Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u, 
+		&Locator::GetVertices()->GetVertexBuffer(model), 
+		&Locator::GetVertices()->GetStride(model), 
+		&Locator::GetVertices()->GetOffset(model));
+
+	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(Locator::GetVertices()->GetIndexBuffer(model), DXGI_FORMAT_R16_UINT, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, &Locator::GetTexture()->GetTextureView(texture));
+
+	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout(Locator::GetShader()->GetInputLayout(shader));
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetShader(Locator::GetShader()->GetPixelShader(shader), nullptr, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->VSSetShader(Locator::GetShader()->GetVertexShader(shader), nullptr, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetSamplers(0, 1, &Locator::GetTexture()->GetSampleState(texture));
+
+	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndeciesSize(model), 0u, 0u);
+	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
+
+
 }
 
 void Graphics::EndFrame()

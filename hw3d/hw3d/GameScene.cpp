@@ -33,6 +33,7 @@ bool GameScene::Init()
 		mGObjects.push_back(mod);
 		mGObjects[i].Init();
 	}
+	mGObjects[1].GetTransform().SetPosX(1);
 
 	mCam = std::make_unique<Camera>();
 	mCam->SetPos(0, 0, -5);
@@ -83,7 +84,7 @@ Scene::CurrentScene GameScene::Update()
 
 	for (int i = 0; i < mObjNum; i++)
 	{
-		mGObjects[i].GetTransform().SetRotY(30* Locator::GetTimer()->Peek());
+		mGObjects[i].GetTransform().SetRotY(10* Locator::GetTimer()->Peek());
 		mGObjects[i].Update();
 	}
 
@@ -96,6 +97,6 @@ void GameScene::Render()
 	//mCam->Render();
 	for (int i = 0; i < mObjNum; i++)
 	{
-		Locator::GetGraphics()->CheckHResults(mGObjects[i].Render(mCam->GetViewMatrix()));
+		mGObjects[i].Render(mCam->GetViewMatrix());
 	}
 }
