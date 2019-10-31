@@ -39,10 +39,10 @@ HRESULT D3D::Init(HWND hWnd)
 		0,
 		D3D11_SDK_VERSION,
 		&sd,
-		&p_swapChain,
-		&p_device,
+		&pSwapChain,
+		&pDevice,
 		nullptr,
-		&p_deviceContext
+		&pDeviceContext
 	);
 
 	float fieldOfView = (float)dx::XM_PI / 4.0f;
@@ -52,8 +52,8 @@ HRESULT D3D::Init(HWND hWnd)
 	//D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
 
 
-	m_projectionMatrix = dx::XMMatrixPerspectiveFovLH(1.0f, screenAspect, 0.1f, 1000.0f);
-	m_worldMatrix = dx::XMMatrixIdentity();
+	mProjectionMatrix = dx::XMMatrixPerspectiveFovLH(1.0f, screenAspect, 0.1f, 1000.0f);
+	mViewMatrix = dx::XMMatrixIdentity();
 
 
 	return hr;
@@ -61,37 +61,37 @@ HRESULT D3D::Init(HWND hWnd)
 
 ID3D11Device* D3D::GetDevice()
 {
-	return p_device;
+	return pDevice;
 }
 
 IDXGISwapChain* D3D::GetSwapChain()
 {
-	return p_swapChain;
+	return pSwapChain;
 }
 
 ID3D11DeviceContext* D3D::GetDeviceContext()
 {
-	return p_deviceContext;
+	return pDeviceContext;
 }
 
-DirectX::XMMATRIX D3D::GetWorldMatrix()
+DirectX::XMMATRIX& D3D::GetViewMatrix()
 {
-	return m_worldMatrix;
+	return mViewMatrix;
 }
 
 DirectX::XMMATRIX D3D::GetProjMatrix()
 {
-	return m_projectionMatrix;
+	return mProjectionMatrix;
 }
 
-void D3D::SetWorldMatrix(DirectX::XMMATRIX maxtrix)
+void D3D::SetViewMatrix(DirectX::XMMATRIX maxtrix)
 {
-	m_worldMatrix = maxtrix;
+	mViewMatrix = maxtrix;
 }
 
 void D3D::SetProjMatrix(DirectX::XMMATRIX maxtrix)
 {
-	m_projectionMatrix = maxtrix;
+	mProjectionMatrix = maxtrix;
 }
 
 //Microsoft::WRL::ComPtr<ID3D11Device> D3D::GetDevice()

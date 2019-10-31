@@ -10,6 +10,7 @@ class Texture;
 class Shader;
 class Light;
 class Matrices;
+struct Misc;
 
 class Locator
 {
@@ -83,6 +84,10 @@ public:
 		return light;
 	}
 
+	static void InitLight(Light* _light) {
+		light = _light;
+	}
+
 	static void InitMatrices(Matrices* _matrices) {
 		matrices = _matrices;
 	}
@@ -91,8 +96,12 @@ public:
 		return matrices;
 	}
 
-	static void InitLight(Light* _light) {
-		light = _light;
+	static void InitMisc(Misc* _misc) {
+		misc = _misc;
+	}
+
+	static Misc* GetMisc() {
+		return misc;
 	}
 
 	static Graphics* GetGraphics(){
@@ -115,6 +124,7 @@ private:
 	static Shader* shader;
 	static Light* light;
 	static Matrices* matrices;
+	static Misc* misc;
 
 	// Static Variables
 	static bool* exit;

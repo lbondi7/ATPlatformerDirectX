@@ -55,7 +55,6 @@ public:
 	Graphics& operator=(const Graphics&) = delete;
 	~Graphics() = default;
 	void Render(DirectX::XMMATRIX wMtrx,
-		DirectX::XMMATRIX vMtrx,
 		const std::string& model,
 		const std::string& texture,
 		const std::string& shader);
@@ -72,5 +71,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepStenView;
 	std::unique_ptr<D3D> d3d;
 	ID3D11RasterizerState* m_rasterState;
-	DirectX::XMMATRIX projMatrix;
+	DirectX::XMMATRIX mProjMatrixCopy;
+	DirectX::XMMATRIX mViewMatrixCopy;
 };

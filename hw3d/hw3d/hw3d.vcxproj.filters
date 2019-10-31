@@ -16,9 +16,6 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{b2f2c6e6-aff3-4727-b812-a0e220903116}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Debug">
-      <UniqueIdentifier>{ed2787a3-2615-486c-ac1e-ff9698c4f8ce}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Debug">
       <UniqueIdentifier>{ccad0eb4-94fd-4a32-9e9e-2e8d0ee99727}</UniqueIdentifier>
     </Filter>
@@ -28,20 +25,8 @@
     <Filter Include="Source Files\Graphics">
       <UniqueIdentifier>{b0bfd3a4-0419-4b66-8199-b6e501e67d36}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics">
-      <UniqueIdentifier>{cb4f974a-1efa-40b6-bf58-0f50c8b5b926}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{97a4438f-c861-4907-8564-a89beb67c037}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Windows">
-      <UniqueIdentifier>{d44846a6-e5cd-4008-a9ac-359cf79e5651}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Objects">
-      <UniqueIdentifier>{4e92e3c5-2240-4b0e-a08a-0730ef3b2125}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\DirectX">
-      <UniqueIdentifier>{3fec7aeb-daca-4351-b66d-38a4937aed6a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\DirectX">
       <UniqueIdentifier>{207b88c6-b135-49bb-a7f4-e0078e3c0f00}</UniqueIdentifier>
@@ -52,91 +37,121 @@
     <Filter Include="Source Files\Scene">
       <UniqueIdentifier>{f567fdc4-8865-47b7-9c8a-e95322e461ce}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Scene">
+    <Filter Include="Header Files\Backend">
+      <UniqueIdentifier>{4c7f45fb-7655-45cd-bbb1-0fccfffabacf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Graphics">
+      <UniqueIdentifier>{cb4f974a-1efa-40b6-bf58-0f50c8b5b926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Graphics\Buffers">
+      <UniqueIdentifier>{129bced5-e713-4a80-b0d1-f78b6e119b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Windows">
+      <UniqueIdentifier>{d44846a6-e5cd-4008-a9ac-359cf79e5651}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\DirectX">
+      <UniqueIdentifier>{3fec7aeb-daca-4351-b66d-38a4937aed6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Backend\Debug">
+      <UniqueIdentifier>{ed2787a3-2615-486c-ac1e-ff9698c4f8ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Objects">
+      <UniqueIdentifier>{4e92e3c5-2240-4b0e-a08a-0730ef3b2125}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Scene">
       <UniqueIdentifier>{2ec4aa52-5b00-4175-b868-ac5d8c8413f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Graphics\Buffers">
-      <UniqueIdentifier>{129bced5-e713-4a80-b0d1-f78b6e119b4b}</UniqueIdentifier>
+    <Filter Include="Header Files\Backend\Inputs">
+      <UniqueIdentifier>{493f7e74-141d-4dbe-8844-34bc58d4020a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Locator.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LewisException.h">
-      <Filter>Header Files\Debug</Filter>
+      <Filter>Header Files\Backend\Debug</Filter>
     </ClInclude>
     <ClInclude Include="dxerr.h">
-      <Filter>Header Files\Debug</Filter>
+      <Filter>Header Files\Backend\Debug</Filter>
     </ClInclude>
     <ClInclude Include="DxgiInfoManager.h">
-      <Filter>Header Files\Debug</Filter>
+      <Filter>Header Files\Backend\Debug</Filter>
     </ClInclude>
     <ClInclude Include="Graphics.h">
-      <Filter>Header Files\Graphics</Filter>
+      <Filter>Header Files\Backend\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Window.h">
-      <Filter>Header Files\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Game.h">
-      <Filter>Header Files\Game</Filter>
+      <Filter>Header Files\Backend\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="WinSetup.h">
-      <Filter>Header Files\Windows</Filter>
+      <Filter>Header Files\Backend\Windows</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Header Files\Windows</Filter>
+      <Filter>Header Files\Backend\Windows</Filter>
     </ClInclude>
     <ClInclude Include="GameObject.h">
-      <Filter>Header Files\Objects</Filter>
-    </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game\Objects</Filter>
     </ClInclude>
     <ClInclude Include="D3D.h">
-      <Filter>Header Files\DirectX</Filter>
+      <Filter>Header Files\Backend\DirectX</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h">
       <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="SceneManager.h">
-      <Filter>Header Files\Scene</Filter>
+      <Filter>Header Files\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h">
-      <Filter>Header Files\Scene</Filter>
+      <Filter>Header Files\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="MenuScene.h">
-      <Filter>Header Files\Scene</Filter>
+      <Filter>Header Files\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="GameScene.h">
-      <Filter>Header Files\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Vertices.h">
-      <Filter>Header Files\Graphics\Buffers</Filter>
+      <Filter>Header Files\Backend\Graphics\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Header Files\Graphics\Buffers</Filter>
+      <Filter>Header Files\Backend\Graphics\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>Header Files\Graphics\Buffers</Filter>
+      <Filter>Header Files\Backend\Graphics\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Light.h">
-      <Filter>Header Files\Graphics\Buffers</Filter>
+      <Filter>Header Files\Backend\Graphics\Buffers</Filter>
     </ClInclude>
     <ClInclude Include="Matrices.h">
-      <Filter>Header Files\Graphics\Buffers</Filter>
+      <Filter>Header Files\Backend\Graphics\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Locator.h">
+      <Filter>Header Files\Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Mouse.h">
+      <Filter>Header Files\Backend\Inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="Keyboard.h">
+      <Filter>Header Files\Backend\Inputs</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files\Backend\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Maths.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Header Files\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +222,9 @@
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Matrices.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Maths.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

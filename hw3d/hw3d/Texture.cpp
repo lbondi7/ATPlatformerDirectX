@@ -162,10 +162,10 @@ bool Texture::LoadTarga(char* filename, int& height, int& width)
 	{
 		for (i = 0; i < width; i++)
 		{
-			m_targaData[index + 0] = targaImage[k + 2];  // Red.
-			m_targaData[index + 1] = targaImage[k + 1];  // Green.
-			m_targaData[index + 2] = targaImage[k + 0];  // Blue
-			m_targaData[index + 3] = targaImage[k + 3];  // Alpha
+			m_targaData[index + 0] = targaImage[k + 2];//2];  // Red.
+			m_targaData[index + 1] = targaImage[k + 1];//1];  // Green.
+			m_targaData[index + 2] = targaImage[k + 0];//0];  // Blue
+			m_targaData[index + 3] = targaImage[k + 3];//3];  // Alpha
 
 			// Increment the indexes into the targa data.
 			k += 4;

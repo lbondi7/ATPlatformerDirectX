@@ -6,6 +6,7 @@
 #include "Shader.h"
 #include "Light.h"
 #include "Matrices.h"
+#include "Misc.h"
 
 #include <sstream>
 #include <D3Dcompiler.h>
@@ -80,7 +81,7 @@ Graphics::Graphics( HWND hWnd )
 	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
 
 	D3D11_RASTERIZER_DESC rasterDesc = {};
-	rasterDesc.AntialiasedLineEnable = true;
+	rasterDesc.AntialiasedLineEnable = false;
 	rasterDesc.CullMode = D3D11_CULL_BACK;
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
@@ -114,17 +115,21 @@ Graphics::Graphics( HWND hWnd )
 	Locator::GetVertices()->CreateBuffer("cube");
 	Locator::GetVertices()->CreateBuffer("iso");
 	Locator::GetTexture()->CreateTextures("Simon");
-	Locator::GetTexture()->CreateTextures("Scary");
+	Locator::GetTexture()->CreateTextures("UV");
 	Locator::GetTexture()->CreateTextures("MrBean");
 	Locator::GetShader()->CreateShader("basic");
 	Locator::GetLight()->CreateBuffer();
 	Locator::GetMatrices()->CreateBuffer();
+	Locator::GetMisc()->SetClearColour({ 1, 0, 0, 1 });
 }
 
-void Graphics::Render(dx::XMMATRIX wMtrx, dx::XMMATRIX vMtrx, const std::string& model, const std::string& texture, const std::string& shader)
+void Graphics::Render(dx::XMMATRIX wMtrx,const std::string& model, const std::string& texture, const std::string& shader)
 {
-	projMatrix = dx::XMMatrixTranspose(d3d->GetProjMatrix());
-	CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, vMtrx, projMatrix));
+	mProjMatrixCopy = dx::XMMatrixTranspose(d3d->GetProjMatrix());
+	mViewMatrixCopy = d3d->GetViewMatrix();
+	mViewMatrixCopy = dx::XMMatrixTranspose(mViewMatrixCopy);
+
+	CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, mViewMatrixCopy, mProjMatrixCopy));
 
 	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, &Locator::GetMatrices()->GetBuffer());
 
@@ -151,7 +156,7 @@ void Graphics::Render(dx::XMMATRIX wMtrx, dx::XMMATRIX vMtrx, const std::string&
 
 	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndeciesSize(model), 0u, 0u);
+	Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndicesSize(model), 0u, 0u);
 	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
 
 
@@ -178,8 +183,11 @@ void Graphics::EndFrame()
 
 void Graphics::ClearBuffer( float r,float g,float b , float a) noexcept
 {
-	const float color[] = { r, g, b, a };
-	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),color );
+	const float colour[] = { Locator::GetMisc()->GetClearColour().x,
+		Locator::GetMisc()->GetClearColour().w,
+		Locator::GetMisc()->GetClearColour().z,
+		Locator::GetMisc()->GetClearColour().w };
+	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),colour );
 	d3d->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 

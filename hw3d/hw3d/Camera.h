@@ -1,6 +1,6 @@
 #pragma once
-
-#include <DirectXMath.h>
+#include "Transform.h"
+#include "Maths.h"
 
 class Camera
 {
@@ -8,41 +8,25 @@ public:
 	Camera();
 	~Camera();
 
+	void Init();
 	void Update();
 	void Render();
 
+	void SetLookAt(const Vector4& _lookAt);
+	void SetRotMatrix(const Matrix& rotMat);
 
-	DirectX::XMVECTOR GetPos();
-	float GetPosX();
-	float GetPosY();
-	float GetPosZ();
+	Transform& GetTransform();
 
-	DirectX::XMVECTOR GetRot();
-	float GetRotX();
-	float GetRotY();
-	float GetRotZ();
+	void SetOffset(const Vector4& _offset);
 
-	void SetPos(DirectX::XMVECTOR pos);
-	void SetPos(float x, float y, float z);
-	void SetPosX(float x);
-	void SetPosY(float y);
-	void SetPosZ(float z);
-	void SetRot(DirectX::XMVECTOR rot);
-	void SetRot(float x, float y, float z);
-	void SetRotX(float x);
-	void SetRotY(float y);
-	void SetRotZ(float z);
-
-	DirectX::XMMATRIX GetViewMatrix();
-	void SetViewMatrix(DirectX::XMMATRIX matrix);
+	void SetPhiTheta(float _phi, float _theta);
 
 private:
 
-	DirectX::XMMATRIX mViewMatrix;
-	DirectX::XMVECTOR position;
-	DirectX::XMVECTOR rotation;
+	DirectX::XMMATRIX* mViewMatrix = nullptr;
 	DirectX::XMMATRIX rotationMatrix;
-	DirectX::XMVECTOR up;
-	DirectX::XMVECTOR lookAt;
+	DirectX::XMVECTOR up, lookAtPos, offset;
+	float phi = 0, theta = 0;
+	Transform transform;
 };
 

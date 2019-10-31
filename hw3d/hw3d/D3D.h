@@ -14,25 +14,19 @@ public:
 
 	HRESULT Init(HWND hWnd);
 
-	//Microsoft::WRL::ComPtr<ID3D11Device> GetDevice();
-	//Microsoft::WRL::ComPtr<IDXGISwapChain> GetSwapChain();
-	//Microsoft::WRL::ComPtr<ID3D11DeviceContext> GetDeviceContext();
 	ID3D11Device* GetDevice();
 	IDXGISwapChain* GetSwapChain();
 	ID3D11DeviceContext* GetDeviceContext();
-	DirectX::XMMATRIX GetWorldMatrix();
+	DirectX::XMMATRIX& GetViewMatrix();
 	DirectX::XMMATRIX GetProjMatrix();
-	void SetWorldMatrix(DirectX::XMMATRIX maxtrix);
+	void SetViewMatrix(DirectX::XMMATRIX maxtrix);
 	void SetProjMatrix(DirectX::XMMATRIX maxtrix);
 
-	//Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
-	//Microsoft::WRL::ComPtr<IDXGISwapChain> pSwapChain;
-	//Microsoft::WRL::ComPtr<ID3D11DeviceContext> pDeviceContext;
 private:
-	ID3D11Device* p_device = nullptr;
-	ID3D11DeviceContext* p_deviceContext = nullptr;
-	IDXGISwapChain* p_swapChain = nullptr;
-	DirectX::XMMATRIX m_projectionMatrix;
-	DirectX::XMMATRIX m_worldMatrix;
+	ID3D11Device* pDevice = nullptr;
+	ID3D11DeviceContext* pDeviceContext = nullptr;
+	IDXGISwapChain* pSwapChain = nullptr;
+	DirectX::XMMATRIX mProjectionMatrix;
+	DirectX::XMMATRIX mViewMatrix;
 };
 

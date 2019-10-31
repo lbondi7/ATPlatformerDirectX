@@ -1,8 +1,8 @@
 #include "MenuScene.h"
 
 #include "Locator.h"
-#include "Graphics.h"
 #include "Keyboard.h"
+#include "Misc.h"
 
 MenuScene::~MenuScene()
 {
@@ -10,6 +10,7 @@ MenuScene::~MenuScene()
 
 bool MenuScene::Init()
 {
+	Locator::GetMisc()->SetClearColour({ 1, 0, 0, 1 });
 	return true;
 }
 

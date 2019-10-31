@@ -9,6 +9,7 @@
 #include "Shader.h"
 #include "Light.h"
 #include "Matrices.h"
+#include "Misc.h"
 
 #include <iomanip>
 #include <thread>
@@ -28,6 +29,7 @@ bool Game::Init()
 	Locator::InitShader(new Shader());
 	Locator::InitLight(new Light());
 	Locator::InitMatrices(new Matrices());
+	Locator::InitMisc(new Misc());
 
 	Locator::InitExitBool();
 	Locator::GetKey()->Initialise();

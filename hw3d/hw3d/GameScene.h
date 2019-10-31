@@ -1,6 +1,6 @@
 #pragma once
 #include "Scene.h"
-#include "Model.h"
+#include "GameObject.h"
 #include "Camera.h"
 
 #include <memory>
@@ -27,8 +27,9 @@ private:
 
 	ChangeScene changeScene = ChangeScene::NONE;
 
-	int mObjNum = 2;
+	int mObjNum = 6;
 
 	std::unique_ptr<Camera> mCam;
-	std::vector<Model> mGObjects;
+	std::vector<GameObject> mGObjects;
+	Matrix mWorldMatrix = DirectX::XMMatrixIdentity();
 };

@@ -2,7 +2,8 @@
 #include "Locator.h"
 #include "Graphics.h"
 
-namespace wrl = Microsoft::WRL;
+#include <DirectXCollision.h>
+
 namespace dx = DirectX;
 
 Model::~Model()
@@ -12,56 +13,33 @@ Model::~Model()
 void Model::Init()
 {
 	mWorldMatrix = dx::XMMatrixIdentity();
+	transform.SetPos(dx::XMVectorZero());
+	transform.SetRot(dx::XMVectorZero());
+	transform.SetScale({1, 1, 1, 1});
 }
 
-void Model::Update()
+void Model::Update(Matrix& objMatrix, Transform& goTransform)
 {
-	mWorldMatrix = dx::XMMatrixTranspose(
-		dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(transform.GetRot()))) *
-		dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(transform.GetRot()))) *
-		dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(transform.GetRot()))) *
-		//dx::XMMatrixRotationRollPitchYawFromVector(transform.GetRot())*
-		dx::XMMatrixScaling(dx::XMVectorGetX(transform.GetScale()),
-			dx::XMVectorGetY(transform.GetScale()),
-			dx::XMVectorGetZ(transform.GetScale())) *
-		dx::XMMatrixTranslation(
-			dx::XMVectorGetX(transform.GetPos()),
-			dx::XMVectorGetY(transform.GetPos()),
-			dx::XMVectorGetZ(transform.GetPos())));
+	transform.Update();
 
-	//m_worldMatrix = dx::XMMatrixTranspose(
-	//	dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(transform.rotation))) *
-	//	dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(transform.rotation))) *
-	//	dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(transform.rotation))) *
-	//	dx::XMMatrixScaling(dx::XMVectorGetX(transform.scale),
-	//		dx::XMVectorGetY(transform.scale),
-	//		dx::XMVectorGetZ(transform.scale)) *
-	//	dx::XMMatrixTranslation(
-	//		dx::XMVectorGetX(transform.position),
-	//		dx::XMVectorGetY(transform.position),
-	//		dx::XMVectorGetZ(transform.position)));
-	//
-	//m_worldMatrix = dx::XMMatrixTranspose(
-	//	dx::XMMatrixRotationX(dx::XMConvertToRadians(dx::XMVectorGetX(rotation))) *
-	//	dx::XMMatrixRotationY(dx::XMConvertToRadians(dx::XMVectorGetY(rotation))) *
-	//	dx::XMMatrixRotationZ(dx::XMConvertToRadians(dx::XMVectorGetZ(rotation))) *
-	//	dx::XMMatrixScaling(dx::XMVectorGetX(scale),
-	//		dx::XMVectorGetY(scale),
-	//		dx::XMVectorGetZ(scale)) *
-	//	dx::XMMatrixTranslation(
-	//		dx::XMVectorGetX(position),
-	//		dx::XMVectorGetY(position),
-	//		dx::XMVectorGetZ(position)));
+	objMatrix = dx::XMMatrixTranspose(
+		//dx::XMMatrixRotationRollPitchYawFromVector(goTransform.GetRotRad()) *
+		dx::XMMatrixRotationRollPitchYaw(goTransform.GetRotXRad(),
+			goTransform.GetRotYRad(),
+			goTransform.GetRotZRad()) *
+		dx::XMMatrixScalingFromVector(goTransform.GetScale()) *
+		dx::XMMatrixTranslationFromVector(goTransform.GetPos()));
+		//dx::XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad()) *
+		//dx::XMMatrixScalingFromVector(transform.GetScale()) *
+		//dx::XMMatrixTranslationFromVector(transform.GetPos())
 }
 
-void Model::Render(DirectX::XMMATRIX viewMatrix)
+void Model::Render(const Matrix& worldMatrix)
 {
-	viewMatrix = dx::XMMatrixTranspose(viewMatrix);
-
-	Locator::GetGraphics()->Render(mWorldMatrix, viewMatrix, mModelType, mTexure, mShader);
+	Locator::GetGraphics()->Render(worldMatrix, mModelType, mTexure, mShader);
 }
 
-Transform& Model::GetTransform()
+Transform& Model::GetOffset()
 {
 	return transform;
 }

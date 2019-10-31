@@ -34,7 +34,7 @@ HRESULT Light::MapResource()
 
 	// Copy the lighting variables into the constant buffer.
 	pLightData->diffuseColor = { 1.0f, 1.0f, 1.0f, 1.0f };
-	pLightData->lightDirection = { 1.0f, 0.0, 1.0, 1.0f };
+	pLightData->lightDirection = { 1.0f, -1.0f, 1.0f, 1.0f };
 	pLightData->padding = 0.0f;
 
 	// Unlock the constant buffer.

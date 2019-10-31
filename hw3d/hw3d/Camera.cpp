@@ -1,45 +1,68 @@
 #include "Camera.h"
+#include "Locator.h"
+#include "D3D.h"
 
-namespace dx = DirectX;
+using namespace DirectX;
 
 Camera::Camera()
 {
-	position = { 0, 0, 0, 0 };
-	rotation = { 0, 0, 0, 0 };
 }
 
 Camera::~Camera()
 {
 }
 
+void Camera::Init()
+{
+	mViewMatrix = &Locator::GetD3D()->GetViewMatrix();
+	offset = { 0, 0, -5, 0 };
+	up = { 0, 1, 0, 0 };
+}
+
 void Camera::Update()
 {
-	up = { 0.0f, 1.0f, 0.0f, 1.0f };
+	//up = { 0.0f, 1.0f, 0.0f, 1.0f };
 
-	// Setup the position of the camera in the world.
-	position = GetPos();
+	//// Setup where the camera is looking by default.
+	//lookAtPos = { 0.0f, 0.0f, 1.0f, 1.0f };
 
-	// Setup where the camera is looking by default.
-	lookAt = { 0.0f, 0.0f, 1.0f, 1.0f };
+	//// Create the rotation matrix from the yaw, pitch, and roll values.
+	////rotationMatrix = dx::XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad());
 
-	// Create the rotation matrix from the yaw, pitch, and roll values.
-	rotationMatrix = dx::XMMatrixRotationRollPitchYaw(
-		GetRotY() * 0.0174532925f,
-		GetRotX() * 0.0174532925f,
-		GetRotZ() * 0.0174532925f);
+	//rotationMatrix = XMMatrixRotationRollPitchYaw(
+	//	transform.GetRotY() * 0.0174532925f,
+	//	transform.GetRotX() * 0.0174532925f,
+	//	transform.GetRotZ() * 0.0174532925f);
 
+	////distance = dx::XMVectorSubtract(lookAtPos, transform.GetPos());
 
-	lookAt = dx::XMVector4Transform(lookAt, rotationMatrix);
-	up = dx::XMVector4Transform(up, rotationMatrix);
-	// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
-	//D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
-	//D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
+	//// Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
+	//lookAtPos = XMVector4Transform(lookAtPos, rotationMatrix);
+	//up = XMVector4Transform(up, rotationMatrix);
 
-	// Translate the rotated camera position to the location of the viewer.
-	lookAt = dx::XMVectorAdd(GetPos(), lookAt);
+	//// Translate the rotated camera position to the location of the viewer.
+	//lookAtPos = XMVectorAdd(transform.GetPos(), lookAtPos);
 
+	////pos = VectorTransform(transform.GetPos(),
+	////	XMMatrixRotationRollPitchYaw(phi, -theta, 0));
 
-	mViewMatrix = dx::XMMatrixLookAtLH(GetPos(), lookAt, up);
+	//*mViewMatrix = XMMatrixLookAtLH(transform.GetPos(), lookAtPos,
+	//	up);
+
+	//transform.SetPos(VectorAdd(lookAtPos,
+	//	VectorTransform(VectorMul(offset,
+	//		{ sinf(0.0f / 57.2958f) , sinf(0.0f / 57.2958f) , cosf(0.0f / 57.2958f) }),
+	//	XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad()))));
+	//
+	////const auto pos = VectorTransform(transform.GetPos(),
+	////	XMMatrixRotationRollPitchYaw(phi, -theta, 0.0f));
+
+	//const auto pos = VectorTransform(offset,
+	//	rotationMatrix);
+
+	*mViewMatrix = XMMatrixLookAtLH(transform.GetPos(), lookAtPos, 
+		up) * XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad());
+
 }
 
 void Camera::Render()
@@ -82,102 +105,28 @@ void Camera::Render()
 	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 }
 
-DirectX::XMVECTOR Camera::GetPos()
+void Camera::SetLookAt(const Vector4& _lookAt)
 {
-	return position;
+	lookAtPos = _lookAt;
 }
 
-float Camera::GetPosX()
+void Camera::SetRotMatrix(const Matrix& rotMat)
 {
-	return dx::XMVectorGetX(position);
+	rotationMatrix = rotMat;
 }
 
-float Camera::GetPosY()
+Transform& Camera::GetTransform()
 {
-	return dx::XMVectorGetY(position);
+	return transform;
 }
 
-float Camera::GetPosZ()
+void Camera::SetOffset(const Vector4& _offset)
 {
-	return dx::XMVectorGetZ(position);
+
 }
 
-DirectX::XMVECTOR Camera::GetRot()
+void Camera::SetPhiTheta(float _phi, float _theta)
 {
-	return rotation;
-}
-
-float Camera::GetRotX()
-{
-	return dx::XMVectorGetX(rotation);
-}
-
-float Camera::GetRotY()
-{
-	return dx::XMVectorGetY(rotation);
-}
-
-float Camera::GetRotZ()
-{
-	return dx::XMVectorGetZ(rotation);
-}
-
-void Camera::SetPos(DirectX::XMVECTOR pos)
-{
-	position = pos;
-}
-
-void Camera::SetPos(float x, float y, float z)
-{
-	position = { x, y, z, dx::XMVectorGetW(position) };
-}
-
-void Camera::SetPosX(float x)
-{
-	position = { x, dx::XMVectorGetY(position), dx::XMVectorGetZ(position), dx::XMVectorGetW(position) };
-}
-
-void Camera::SetPosY(float y)
-{
-	position = { dx::XMVectorGetX(position), y, dx::XMVectorGetZ(position), dx::XMVectorGetW(position) };
-}
-
-void Camera::SetPosZ(float z)
-{
-	position = { dx::XMVectorGetX(position), dx::XMVectorGetY(position), z, dx::XMVectorGetW(position) };
-}
-
-void Camera::SetRot(DirectX::XMVECTOR rot)
-{
-	rotation = rot;
-}
-
-void Camera::SetRot(float x, float y, float z)
-{
-	rotation = { x, y, z, dx::XMVectorGetW(rotation) };
-}
-
-void Camera::SetRotX(float x)
-{
-	rotation = { x, dx::XMVectorGetY(rotation), dx::XMVectorGetZ(rotation), dx::XMVectorGetW(rotation) };
-}
-
-void Camera::SetRotY(float y)
-{
-	rotation = { dx::XMVectorGetX(rotation), y, dx::XMVectorGetZ(rotation), dx::XMVectorGetW(rotation) };
-}
-
-void Camera::SetRotZ(float z)
-{
-	rotation = { dx::XMVectorGetX(rotation), dx::XMVectorGetY(rotation), z, dx::XMVectorGetW(rotation) };
-}
-
-DirectX::XMMATRIX Camera::GetViewMatrix()
-{
-	return mViewMatrix;
-}
-
-void Camera::SetViewMatrix(DirectX::XMMATRIX matrix)
-{
-	mViewMatrix = matrix;
+	phi = _phi;
+	theta = -_theta;
 }
