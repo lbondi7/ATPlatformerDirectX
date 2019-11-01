@@ -72,7 +72,7 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 	};
 
 	std::vector<DirectX::XMFLOAT2> texs;
-	std::vector<Vector4> norm;
+	std::vector<Vector> norm;
 	std::vector<std::vector<Faces>> faces;
 	std::vector<Faces> face;
 	int vertPerFace = 3;
@@ -277,7 +277,7 @@ unsigned int Vertices::GetIndicesSize(const std::string& shapeName)
 	return indicesSize[GetBufferNum(shapeName)];
 }
 
-const std::vector<Vector4>& Vertices::GetVertices(const std::string& modelName)
+const std::vector<Vector>& Vertices::GetVertices(const std::string& modelName)
 {
 	return vertices[model[modelName]];
 }

@@ -12,12 +12,12 @@ public:
 	void Update();
 	void Render();
 
-	void SetLookAt(const Vector4& _lookAt);
+	void SetLookAt(const Vector& _lookAt);
 	void SetRotMatrix(const Matrix& rotMat);
 
 	Transform& GetTransform();
 
-	void SetOffset(const Vector4& _offset);
+	void SetOffset(const Vector& _offset);
 
 	void SetPhiTheta(float _phi, float _theta);
 

@@ -145,10 +145,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Bounds.h" />
     <ClInclude Include="Constants.h" />
+    <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrices.h" />
     <ClInclude Include="Misc.h" />
+    <ClInclude Include="Player.h" />
     <ClInclude Include="Vertices.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="D3D.h" />
@@ -176,8 +179,11 @@
     <ClInclude Include="WinSetup.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bounds.cpp" />
+    <ClCompile Include="LevelLoader.cpp" />
     <ClCompile Include="Maths.cpp" />
     <ClCompile Include="Matrices.cpp" />
+    <ClCompile Include="Player.cpp" />
     <ClCompile Include="Vertices.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />

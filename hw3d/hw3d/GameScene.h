@@ -5,7 +5,6 @@
 
 #include <memory>
 #include <vector>
-#include <thread>
 
 
 class GameScene :
@@ -27,9 +26,12 @@ private:
 
 	ChangeScene changeScene = ChangeScene::NONE;
 
-	int mObjNum = 6;
+	int mObjNum = 0;
 
 	std::unique_ptr<Camera> mCam;
-	std::vector<GameObject> mGObjects;
+	std::vector<GameObject*> pGObjects;
+	std::unique_ptr<GameObject> pPlayer;
 	Matrix mWorldMatrix = DirectX::XMMatrixIdentity();
+
+	bool isColliding = false;
 };

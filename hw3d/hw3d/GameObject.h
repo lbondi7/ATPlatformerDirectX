@@ -1,11 +1,14 @@
 #pragma once
 #include "Model.h"
-#include "Transform.h"
-#include "Maths.h"
+#include "Player.h"
+#include "Bounds.h"
+
+#include <vector>
 
 class GameObject
 {
 public:
+
 	GameObject() = default;
 	~GameObject();
 
@@ -13,25 +16,33 @@ public:
 	void AddModel();
 	Model* GetModel();
 
+	void AddPlayer();
+	Player* GetPlayer();
+
 	void Update(const Matrix& worldMatrix);
 	void Render();
 
 	Transform& GetTransform();
 
-	bool BoundingBoxCollision(const Vector4& objBBMinVertex, const Vector4& objBBMaxVertex);
+	GameObjectTag GetTag();
 
-	Vector4 GetMinVert();
-	Vector4 GetMaxVert();
+	void SetTag(GameObjectTag _tag);
+
+	Bounds& GetBB();
+
+	Matrix GetMatrix();
 
 private:
 
 	Model* pModel = nullptr;
+	Player* pPlayer = nullptr;
 	Transform mTransform;
 
-	Vector4 mBBMin;
-	Vector4 mBBMax;
+	GameObjectTag tag = GameObjectTag::STATIC;
 
 	Matrix mObjMatrix;
-	void CalculateBoundingBox(const Matrix& worldMatrix);
+	std::vector<Vector> mVerts;
+
+	Bounds mBB;
 };
 

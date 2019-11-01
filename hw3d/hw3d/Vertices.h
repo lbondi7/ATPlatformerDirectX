@@ -14,7 +14,7 @@ public:
 	{
 		struct
 		{
-			Vector4 position;
+			Vector position;
 		}pos;
 
 		struct
@@ -25,7 +25,7 @@ public:
 
 		struct
 		{
-			Vector4 normal;
+			Vector normal;
 		}norm;
 
 		//struct
@@ -44,7 +44,7 @@ public:
 	const UINT& GetStride(const std::string& modelName);
 	const UINT& GetOffset(const std::string& modelName);
 	unsigned int GetIndicesSize(const std::string& modelName);
-	const std::vector<Vector4>& GetVertices(const std::string& modelName);
+	const std::vector<Vector>& GetVertices(const std::string& modelName);
 
 	//VertexType* GetVertices();
 
@@ -60,7 +60,7 @@ private:
 	std::vector<UINT> stride;
 	std::vector<UINT> offset;
 	std::vector<int> vertexCount;
-	std::vector<std::vector<Vector4>> vertices;
+	std::vector<std::vector<Vector>> vertices;
 
 	int bufferCount = 0;
 

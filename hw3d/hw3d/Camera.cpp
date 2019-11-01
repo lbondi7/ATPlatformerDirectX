@@ -105,7 +105,7 @@ void Camera::Render()
 	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 }
 
-void Camera::SetLookAt(const Vector4& _lookAt)
+void Camera::SetLookAt(const Vector& _lookAt)
 {
 	lookAtPos = _lookAt;
 }
@@ -120,7 +120,7 @@ Transform& Camera::GetTransform()
 	return transform;
 }
 
-void Camera::SetOffset(const Vector4& _offset)
+void Camera::SetOffset(const Vector& _offset)
 {
 
 }

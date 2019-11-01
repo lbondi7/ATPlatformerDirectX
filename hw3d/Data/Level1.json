@@ -1,0 +1,93 @@
+{
+  "Object Count": 11,
+  "Objects": {
+    "0": {
+      "Position": [ 0, 0, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "1": {
+      "Position": [ 0, 0, 15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "MrBean",
+      "Tag": "ground"
+    },
+    "2": {
+      "Position": [ 15, 0, 15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "3": {
+      "Position": [ 30, 0, 15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "UV",
+      "Tag": "ground"
+    },
+    "4": {
+      "Position": [ 45, 0, 15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "5": {
+      "Position": [ 45, 0, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "6": {
+      "Position": [ 45, 0, -15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "UV",
+      "Tag": "ground"
+    },
+    "7": {
+      "Position": [ 30, 0, -15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "8": {
+      "Position": [ 15, 0, -15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "9": {
+      "Position": [ 0, 0, -15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 1, 5 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "10": {
+      "Position": [22, -15, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 50, 5, 50 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "killbox"
+    }
+  }
+}
