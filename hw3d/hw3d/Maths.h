@@ -73,6 +73,8 @@ namespace LewisMath
 	/* Sets the Z value of the vector passed in to the float value passed in */
 	Vector VectorSetZ(const Vector& vec, float z);
 
+//	Vector GetVecterDir(const Vector& vec);
+
 };
 
 using namespace LewisMath;

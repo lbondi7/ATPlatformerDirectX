@@ -4,6 +4,9 @@
 #include "Constants.h"
 #include "Maths.h"
 
+#include <map>
+#include <string>
+
 class Player
 {
 public:
@@ -18,14 +21,17 @@ public:
 
 	void SetState(PlayerMotionState _state);
 
+	const Vector& GetVelocity();
+
 private:
 
 	PlayerMotionState state = PlayerMotionState::FALLING;
-	Vector velocity;
+	Vector mVelocity;
 	float mass = 25;
 	float acceleration = 0.0f;
 	float drag = 200.0f;
-	float speed = 7500.0f;
-	float rotSpeed = 100000.0f;
+	float mSpeed = 7500.0f;
+	float mRotSpeed = 100000.0f;
+	std::map<PlayerMotionState, std::string> stateMap;
 };
 

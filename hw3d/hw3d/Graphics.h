@@ -60,7 +60,7 @@ public:
 		const std::string& texture,
 		const std::string& shader);
 	void EndFrame();
-	void ClearBuffer(float r, float g, float b, float a) noexcept;
+	void BeginFrame() noexcept;
 	void CheckHResults(HRESULT hr);
 	D3D* GetD3D();
 

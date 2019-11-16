@@ -1,4 +1,5 @@
 #include "D3D.h"
+#include "imgui/imgui_impl_dx11.h"
 
 namespace dx = DirectX;
 
@@ -55,6 +56,7 @@ HRESULT D3D::Init(HWND hWnd)
 	mProjectionMatrix = dx::XMMatrixPerspectiveFovLH(1.0f, screenAspect, 0.1f, 1000.0f);
 	mViewMatrix = dx::XMMatrixIdentity();
 
+	ImGui_ImplDX11_Init(pDevice, pDeviceContext);
 
 	return hr;
 }

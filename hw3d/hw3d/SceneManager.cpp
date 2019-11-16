@@ -2,7 +2,6 @@
 #include "MenuScene.h"
 #include "GameScene.h"
 #include "Locator.h"
-#include "Graphics.h"
 
 bool SceneManager::Init()
 {
@@ -36,12 +35,5 @@ void SceneManager::Update()
 
 void SceneManager::Render()
 {
-	if (currentScene == SceneManager::CurrentScene::MENU)
-		Locator::GetGraphics()->ClearBuffer(1.0f, 0.0f, 0.0f, 1.0f);
-	else if (currentScene == SceneManager::CurrentScene::GAME)
-		Locator::GetGraphics()->ClearBuffer(0.0f, 0.0f, 1.0f, 1.0f);
-
 	activeScene->Render();
-
-	Locator::GetGraphics()->EndFrame();
 }

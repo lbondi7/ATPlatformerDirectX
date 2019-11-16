@@ -3,6 +3,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Locator.h"
+#include "imgui///imgui_impl_win32.h"
 
 #include <sstream>
 
@@ -75,6 +76,8 @@ Window::Window( int width,int height,const char* name )
 	}
 	// newly created windows start off as hidden
 	ShowWindow( hWnd,SW_SHOWDEFAULT );
+
+	ImGui_ImplWin32_Init(hWnd);
 	// create graphics object
 	pGraphics = std::make_unique<Graphics>( hWnd );
 	Locator::InitGraphics(pGraphics.get());
@@ -82,6 +85,7 @@ Window::Window( int width,int height,const char* name )
 
 Window::~Window()
 {
+	ImGui_ImplWin32_Shutdown();
 	DestroyWindow( hWnd );
 }
 
@@ -153,6 +157,12 @@ LRESULT CALLBACK Window::HandleMsgThunk( HWND hWnd,UINT msg,WPARAM wParam,LPARAM
 
 LRESULT Window::HandleMsg( HWND hWnd,UINT msg,WPARAM wParam,LPARAM lParam ) noexcept
 {
+
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+	{
+		return true;
+	}
+
 	switch( msg )
 	{
 	// we don't want the DefProc to handle this message because

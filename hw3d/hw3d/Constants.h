@@ -1,6 +1,7 @@
 #pragma once
 
-const float gravityForce = 9.80665f;
+const float GRAVITY = 9.80665f;
+const float RADIAN = 57.29577951;
 
 enum class GameObjectTag : int
 {

@@ -7,18 +7,16 @@
 #include "Light.h"
 #include "Matrices.h"
 #include "Misc.h"
+#include "imgui//imgui.h"
+#include "imgui//imgui_impl_win32.h"
+#include "imgui//imgui_impl_dx11.h"
 
 #include <sstream>
-#include <D3Dcompiler.h>
-#include <DirectXMath.h>
+//#include <D3Dcompiler.h>
+//#include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
-
-#define BF Locator::GetVertices()
-
-#pragma comment(lib,"d3d11.lib")
-#pragma comment(lib,"D3DCompiler.lib")
 
 // graphics exception checking/throwing macros (some with dxgi infos)
 #define GRAPHICS_EXCEPT_NOINFO(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
@@ -158,12 +156,13 @@ void Graphics::Render(dx::XMMATRIX wMtrx,const std::string& model, const std::st
 
 	Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndicesSize(model), 0u, 0u);
 	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
-
-
 }
 
 void Graphics::EndFrame()
 {
+	ImGui::Render();
+	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 	HRESULT hr;
 #ifndef NDEBUG
 	infoManager.Set();
@@ -181,8 +180,12 @@ void Graphics::EndFrame()
 	}
 }
 
-void Graphics::ClearBuffer( float r,float g,float b , float a) noexcept
+void Graphics::BeginFrame() noexcept
 {
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
 	const float colour[] = { Locator::GetMisc()->GetClearColour().x,
 		Locator::GetMisc()->GetClearColour().w,
 		Locator::GetMisc()->GetClearColour().z,

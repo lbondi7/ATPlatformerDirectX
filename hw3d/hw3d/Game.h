@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Timer.h"
 #include "SceneManager.h"
+#include "ImGuiManager.h"
 
 class Game
 {
@@ -17,5 +18,6 @@ private:
 	Window* window = nullptr;
 	Timer timer;
 	std::unique_ptr<SceneManager> sceneManager;
+	ImGuiManager imgui;
 };
 

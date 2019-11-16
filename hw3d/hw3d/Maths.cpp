@@ -49,17 +49,17 @@ const Matrix& LewisMath::MatrixFromVector(const Vector& vec)
 
 Vector LewisMath::Forward()
 {
-	return { 0, 0, 1, 1 };
+	return { 0.0f, 0.0f, 1.0f, 1.0f };
 }
 
 Vector LewisMath::Up()
 {
-	return { 0, 1, 0, 1 };
+	return { 0.0f, 1.0f, 0.0f, 1.0f };
 }
 
 Vector LewisMath::Right()
 {
-	return { 1, 0, 0, 1 };
+	return { 1.0f, 0.0f, 0.0f, 1.0f };
 }
 
 Vector LewisMath::MoveForward(const Vector& pos, float amount, float rotationY)
@@ -74,30 +74,33 @@ Vector LewisMath::MoveBackward(const Vector& pos, float amount, float rotationY)
 
 float LewisMath::VectorX(const Vector& vec)
 {
-	return XMVectorGetX(vec);
+	//return XMVectorGetX(vec);
+	return vec.m128_f32[0];
 }
 
 float LewisMath::VectorY(const Vector& vec)
 {
-	return XMVectorGetY(vec);
+	//return XMVectorGetY(vec);
+	return vec.m128_f32[1];
 }
 
 float LewisMath::VectorZ(const Vector& vec)
 {
-	return XMVectorGetZ(vec);
+	//return XMVectorGetZ(vec);
+	return vec.m128_f32[2];
 }
 
 Vector LewisMath::VectorSetX(const Vector& vec, float x)
 {
-	return { x, XMVectorGetY(vec), XMVectorGetZ(vec) };
+	return { x, vec.m128_f32[1], vec.m128_f32[2] };
 }
 
 Vector LewisMath::VectorSetY(const Vector& vec, float y)
 {
-	return { XMVectorGetX(vec), y, XMVectorGetZ(vec) };
+	return { vec.m128_f32[0], y, vec.m128_f32[2] };
 }
 
 Vector LewisMath::VectorSetZ(const Vector& vec, float z)
 {
-	return { XMVectorGetX(vec), XMVectorGetY(vec), z };
+	return { vec.m128_f32[0], vec.m128_f32[1], z };
 }

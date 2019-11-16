@@ -14,6 +14,9 @@
 #include <iomanip>
 #include <thread>
 
+#pragma comment(lib,"d3d11.lib")
+#pragma comment(lib,"D3DCompiler.lib")
+
 Game::Game()
 {
 }
@@ -57,9 +60,10 @@ void Game::Run()
 
 void Game::Update()
 {
+	Locator::GetGraphics()->BeginFrame();
 	sceneManager->Update();
 	sceneManager->Render();
-	
+	Locator::GetGraphics()->EndFrame();
 }
 
 void Game::Exit()

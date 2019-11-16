@@ -1,4 +1,6 @@
 #pragma once
+#include "Constants.h"
+
 #include <DirectXMath.h>
 
 struct Transform
@@ -6,21 +8,24 @@ struct Transform
 public:
 	DirectX::XMVECTOR position = DirectX::XMVectorZero();
 	DirectX::XMVECTOR rotation = DirectX::XMVectorZero();
-	DirectX::XMVECTOR scale = {1, 1, 1, 1};
+	DirectX::XMVECTOR scale = {1.0f, 1.0f, 1.0f, 1.0f};
 
 	void Update()
 	{
-		if (DirectX::XMVectorGetX(rotation) >= 360.0f)
+		if (rotation.m128_f32[0] >= 360.0f || rotation.m128_f32[0] <= -360.0f)
 		{
-			DirectX::XMVectorSetX(rotation, 0.0f);
+			rotation.m128_f32[0] = 0.0f;
+		//	DirectX::XMVectorSetX(rotation, 0.0f);
 		}
-		if (DirectX::XMVectorGetY(rotation) >= 360.0f)
+		if (rotation.m128_f32[1] >= 360.0f || rotation.m128_f32[1] <= -360.0f)
 		{
-			DirectX::XMVectorSetY(rotation, 0.0f);
+			rotation.m128_f32[1] = 0.0f;
+			//DirectX::XMVectorSetY(rotation, 0.0f);
 		}
-		if (DirectX::XMVectorGetZ(rotation) >= 360.0f)
+		if (rotation.m128_f32[2] >= 360.0f || rotation.m128_f32[2] <= -360.0f)
 		{
-			DirectX::XMVectorSetZ(rotation, 0.0f);
+			rotation.m128_f32[2] = 0.0f;
+			//DirectX::XMVectorSetZ(rotation, 0.0f);
 		}
 	}
 
@@ -31,17 +36,17 @@ public:
 
 	float GetPosX()
 	{
-		return DirectX::XMVectorGetX(position);
+		return position.m128_f32[0];
 	}
 
 	float GetPosY()
 	{
-		return DirectX::XMVectorGetY(position);
+		return position.m128_f32[1];
 	}
 
 	float GetPosZ()
 	{
-		return DirectX::XMVectorGetZ(position);
+		return position.m128_f32[2];
 	}
 
 	const DirectX::XMVECTOR& GetRot()
@@ -52,40 +57,40 @@ public:
 	const DirectX::XMVECTOR& GetRotRad()
 	{
 		return DirectX::XMVECTOR{
-			DirectX::XMConvertToRadians(DirectX::XMVectorGetX(rotation)),
-			DirectX::XMConvertToRadians(DirectX::XMVectorGetY(rotation)),
-			DirectX::XMConvertToRadians(DirectX::XMVectorGetZ(rotation)),
+			rotation.m128_f32[0] / RADIAN,
+			rotation.m128_f32[1] / RADIAN,
+			rotation.m128_f32[2] / RADIAN,
 		    1.0f };
 	}
 
 	float GetRotX()
 	{
-		return DirectX::XMVectorGetX(rotation);
+		return rotation.m128_f32[0];
 	}
 
 	float GetRotY()
 	{
-		return DirectX::XMVectorGetY(rotation);
+		return rotation.m128_f32[1];
 	}
 
 	float GetRotZ()
 	{
-		return DirectX::XMVectorGetZ(rotation);
+		return rotation.m128_f32[2];
 	}
 
 	float GetRotXRad()
 	{
-		return DirectX::XMConvertToRadians(DirectX::XMVectorGetX(rotation));
+		return rotation.m128_f32[0] / RADIAN;
 	}
 
 	float GetRotYRad()
 	{
-		return DirectX::XMConvertToRadians(DirectX::XMVectorGetY(rotation));
+		return rotation.m128_f32[1] / RADIAN;
 	}
 
 	float GetRotZRad()
 	{
-		return DirectX::XMConvertToRadians(DirectX::XMVectorGetZ(rotation));
+		return rotation.m128_f32[2] / RADIAN;
 	}
 
 	const DirectX::XMVECTOR& GetScale()
@@ -95,17 +100,17 @@ public:
 
 	float GetScaleX()
 	{
-		return DirectX::XMVectorGetX(scale);
+		return scale.m128_f32[0];
 	}
 
 	float GetScaleY()
 	{
-		return DirectX::XMVectorGetY(scale);
+		return scale.m128_f32[1];
 	}
 
 	float GetScaleZ()
 	{
-		return DirectX::XMVectorGetZ(scale);
+		return scale.m128_f32[3];
 	}
 
 	void SetPos(const DirectX::XMVECTOR& pos)
@@ -115,22 +120,28 @@ public:
 
 	void SetPos(float x, float y, float z)
 	{
-		position = { x, y, z, DirectX::XMVectorGetW(position) };
+		position.m128_f32[0] = x;
+		position.m128_f32[1] = y;
+		position.m128_f32[2] = z;
+		//position = { x, y, z, DirectX::XMVectorGetW(position) };
 	}
 
 	void SetPosX(float x)
 	{
-		position = { x, DirectX::XMVectorGetY(position), DirectX::XMVectorGetZ(position), DirectX::XMVectorGetW(position) };
+		position.m128_f32[0] = x;
+		//position = { x, DirectX::XMVectorGetY(position), DirectX::XMVectorGetZ(position), DirectX::XMVectorGetW(position) };
 	}
 
 	void SetPosY(float y)
 	{
-		position = { DirectX::XMVectorGetX(position), y, DirectX::XMVectorGetZ(position), DirectX::XMVectorGetW(position) };
+		position.m128_f32[1] = y;
+		//position = { DirectX::XMVectorGetX(position), y, DirectX::XMVectorGetZ(position), DirectX::XMVectorGetW(position) };
 	}
 
 	void SetPosZ(float z)
 	{
-		position = { DirectX::XMVectorGetX(position), DirectX::XMVectorGetY(position), z, DirectX::XMVectorGetW(position) };
+		position.m128_f32[2] = z;
+		//position = { DirectX::XMVectorGetX(position), DirectX::XMVectorGetY(position), z, DirectX::XMVectorGetW(position) };
 	}
 
 	void SetRot(const DirectX::XMVECTOR& _rotation)
@@ -140,22 +151,28 @@ public:
 
 	void SetRot(float x, float y, float z)
 	{
-		rotation = { x, y, z, DirectX::XMVectorGetW(rotation) };
+		rotation.m128_f32[0] = x;
+		rotation.m128_f32[1] = y;
+		rotation.m128_f32[2] = z;
+		//rotation = { x, y, z, DirectX::XMVectorGetW(rotation) };
 	}
 
 	void SetRotX(float x)
 	{
-		rotation = { x, DirectX::XMVectorGetY(rotation), DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) };
+		rotation.m128_f32[0] = x;
+		//rotation = { x, DirectX::XMVectorGetY(rotation), DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) };
 	}
 
 	void SetRotY(float y)
 	{
-		rotation = { DirectX::XMVectorGetX(rotation), y, DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) };
+		rotation.m128_f32[1] = y;
+		//rotation = { DirectX::XMVectorGetX(rotation), y, DirectX::XMVectorGetZ(rotation), DirectX::XMVectorGetW(rotation) };
 	}
 
 	void SetRotZ(float z)
 	{
-		rotation = { DirectX::XMVectorGetX(rotation), DirectX::XMVectorGetY(rotation), z, DirectX::XMVectorGetW(rotation) };
+		rotation.m128_f32[2] = z;
+		//rotation = { DirectX::XMVectorGetX(rotation), DirectX::XMVectorGetY(rotation), z, DirectX::XMVectorGetW(rotation) };
 	}
 
 	void SetScale(const DirectX::XMVECTOR& _scale)
@@ -165,21 +182,27 @@ public:
 
 	void SetScale(float x, float y, float z)
 	{
-		scale = { x, y, z, DirectX::XMVectorGetW(scale) };
+		scale.m128_f32[0] = x;
+		scale.m128_f32[1] = y;
+		scale.m128_f32[2] = z;
+		//scale = { x, y, z, DirectX::XMVectorGetW(scale) };
 	}
 
 	void SetScaleX(float x)
 	{
-		scale = { x, DirectX::XMVectorGetY(scale), DirectX::XMVectorGetZ(scale), DirectX::XMVectorGetW(scale) };
+		scale.m128_f32[0] = x;
+		//scale = { x, DirectX::XMVectorGetY(scale), DirectX::XMVectorGetZ(scale), DirectX::XMVectorGetW(scale) };
 	}
 
 	void SetScaleY(float y)
 	{
-		scale = { DirectX::XMVectorGetX(scale), y, DirectX::XMVectorGetZ(scale), DirectX::XMVectorGetW(scale) };
+		scale.m128_f32[1] = y;
+		//scale = { DirectX::XMVectorGetX(scale), y, DirectX::XMVectorGetZ(scale), DirectX::XMVectorGetW(scale) };
 	}
 
 	void SetScaleZ(float z)
 	{
-		scale = { DirectX::XMVectorGetX(scale), DirectX::XMVectorGetY(scale), z, DirectX::XMVectorGetW(scale) };
+		scale.m128_f32[2] = z;
+		//scale = { DirectX::XMVectorGetX(scale), DirectX::XMVectorGetY(scale), z, DirectX::XMVectorGetW(scale) };
 	}
 };

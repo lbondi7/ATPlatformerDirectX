@@ -12,36 +12,37 @@ Model::~Model()
 
 void Model::Init()
 {
-	mWorldMatrix = dx::XMMatrixIdentity();
-	transform.SetPos(dx::XMVectorZero());
-	transform.SetRot(dx::XMVectorZero());
-	transform.SetScale({1, 1, 1, 1});
+	mModelMatrix = dx::XMMatrixIdentity();
+	mTransform.SetPos(dx::XMVectorZero());
+	mTransform.SetRot(dx::XMVectorZero());
+	mTransform.SetScale({1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void Model::Update(Matrix& objMatrix, Transform& goTransform)
 {
-	transform.Update();
+	mTransform.Update();
 
-	objMatrix = dx::XMMatrixTranspose(
-		//dx::XMMatrixRotationRollPitchYawFromVector(goTransform.GetRotRad()) *
-		dx::XMMatrixRotationRollPitchYaw(goTransform.GetRotXRad(),
-			goTransform.GetRotYRad(),
-			goTransform.GetRotZRad()) *
-		dx::XMMatrixScalingFromVector(goTransform.GetScale()) *
-		dx::XMMatrixTranslationFromVector(goTransform.GetPos()));
-		//dx::XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad()) *
-		//dx::XMMatrixScalingFromVector(transform.GetScale()) *
-		//dx::XMMatrixTranslationFromVector(transform.GetPos())
+	mModelMatrix = dx::XMMatrixTranspose(
+	dx::XMMatrixRotationRollPitchYawFromVector(mTransform.GetRotRad())*
+		dx::XMMatrixScalingFromVector(mTransform.GetScale())*
+		dx::XMMatrixTranslationFromVector(mTransform.GetPos()));
+	mModelMatrix *= objMatrix;
+	//dx::XMMatrixRotationRollPitchYawFromVector(goTransform.GetRotRad()) *
+//dx::XMMatrixRotationRollPitchYaw(goTransform.GetRotXRad(),
+//	goTransform.GetRotYRad(),
+//	goTransform.GetRotZRad()) *
+//dx::XMMatrixScalingFromVector(goTransform.GetScale()) *
+//dx::XMMatrixTranslationFromVector(goTransform.GetPos()));
 }
 
 void Model::Render(const Matrix& worldMatrix)
 {
-	Locator::GetGraphics()->Render(worldMatrix, mModelType, mTexure, mShader);
+	Locator::GetGraphics()->Render(mModelMatrix, mModelType, mTexure, mShader);
 }
 
 Transform& Model::GetOffset()
 {
-	return transform;
+	return mTransform;
 }
 
 //

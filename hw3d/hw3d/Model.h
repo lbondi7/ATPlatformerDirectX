@@ -35,6 +35,6 @@ private:
 	std::string mTexure = "Simon";
 	std::string mShader = "basic";
 
-	DirectX::XMMATRIX mWorldMatrix;
-	Transform transform;
+	DirectX::XMMATRIX mModelMatrix;
+	Transform mTransform;
 };

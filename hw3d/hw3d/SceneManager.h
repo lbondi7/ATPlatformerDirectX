@@ -21,6 +21,5 @@ private:
 	};
 
 	CurrentScene currentScene = CurrentScene::MENU;
-
 };
 

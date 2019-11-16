@@ -16,26 +16,14 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{b2f2c6e6-aff3-4727-b812-a0e220903116}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Debug">
-      <UniqueIdentifier>{ccad0eb4-94fd-4a32-9e9e-2e8d0ee99727}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game">
       <UniqueIdentifier>{084dc73e-9d91-4dbf-bdd2-cc373b60b9dd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Graphics">
-      <UniqueIdentifier>{b0bfd3a4-0419-4b66-8199-b6e501e67d36}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Game">
       <UniqueIdentifier>{97a4438f-c861-4907-8564-a89beb67c037}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\DirectX">
-      <UniqueIdentifier>{207b88c6-b135-49bb-a7f4-e0078e3c0f00}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Game\Objects">
       <UniqueIdentifier>{0b6ec432-29f7-422e-9a71-5fffc1555f31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Scene">
-      <UniqueIdentifier>{f567fdc4-8865-47b7-9c8a-e95322e461ce}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Backend">
       <UniqueIdentifier>{4c7f45fb-7655-45cd-bbb1-0fccfffabacf}</UniqueIdentifier>
@@ -63,6 +51,45 @@
     </Filter>
     <Filter Include="Header Files\Backend\Inputs">
       <UniqueIdentifier>{493f7e74-141d-4dbe-8844-34bc58d4020a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImGui">
+      <UniqueIdentifier>{62055f32-6301-4044-b701-0826d3964dbf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Game\Utilities">
+      <UniqueIdentifier>{3a764653-b579-4b8c-bd1f-3bac5a18d78d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend">
+      <UniqueIdentifier>{2e9b3a23-21f9-4e14-af6f-7c2799150069}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Scene">
+      <UniqueIdentifier>{f567fdc4-8865-47b7-9c8a-e95322e461ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Graphics">
+      <UniqueIdentifier>{b0bfd3a4-0419-4b66-8199-b6e501e67d36}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Debug">
+      <UniqueIdentifier>{ccad0eb4-94fd-4a32-9e9e-2e8d0ee99727}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\DirectX">
+      <UniqueIdentifier>{207b88c6-b135-49bb-a7f4-e0078e3c0f00}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Graphics\Buffers">
+      <UniqueIdentifier>{49fa2423-6ba8-454c-bf27-28de60bd1cf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Inputs">
+      <UniqueIdentifier>{6914287c-5378-407c-b9b3-b8a7ef4b6c94}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Backend\Windows">
+      <UniqueIdentifier>{15aca6b4-713a-4c49-ad7d-61a14afcf030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Game\Utilities">
+      <UniqueIdentifier>{8116fe2a-68c4-4059-b477-e0afcb73522c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data">
+      <UniqueIdentifier>{474a9b2d-b006-4ec6-9476-2679ca7d179d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Data\Json">
+      <UniqueIdentifier>{add43e30-4d73-49e1-82e8-a7cf11a79f55}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,9 +120,6 @@
     <ClInclude Include="D3D.h">
       <Filter>Header Files\Backend\DirectX</Filter>
     </ClInclude>
-    <ClInclude Include="Camera.h">
-      <Filter>Header Files\Game</Filter>
-    </ClInclude>
     <ClInclude Include="SceneManager.h">
       <Filter>Header Files\Game\Scene</Filter>
     </ClInclude>
@@ -123,14 +147,8 @@
     <ClInclude Include="Matrices.h">
       <Filter>Header Files\Backend\Graphics\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="Model.h">
-      <Filter>Header Files\Backend</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h">
       <Filter>Header Files\Backend</Filter>
-    </ClInclude>
-    <ClInclude Include="Transform.h">
-      <Filter>Header Files\Game</Filter>
     </ClInclude>
     <ClInclude Include="Locator.h">
       <Filter>Header Files\Backend</Filter>
@@ -144,106 +162,163 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files\Backend\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="imgui\imgui_impl_dx11.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Maths.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="imgui\imgui_impl_win32.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="Misc.h">
-      <Filter>Header Files\Game</Filter>
+    <ClInclude Include="imgui\imconfig.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imgui_internal.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_rectpack.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_textedit.h">
+      <Filter>ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="imgui\imstb_truetype.h">
+      <Filter>ImGui</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Header Files\Game\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files\Game\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files\Game\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="Bounds.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Header Files\Game\Utilities</Filter>
     </ClInclude>
     <ClInclude Include="LevelLoader.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Game\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGuiManager.h">
+      <Filter>Header Files\Backend\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files\Game\Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="Maths.h">
+      <Filter>Header Files\Backend\DirectX</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="WinMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Locator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="LewisException.cpp">
-      <Filter>Source Files\Debug</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
     </ClCompile>
     <ClCompile Include="DxgiInfoManager.cpp">
-      <Filter>Source Files\Debug</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
     </ClCompile>
     <ClCompile Include="dxerr.cpp">
-      <Filter>Source Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Game.cpp">
-      <Filter>Source Files\Game</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\Backend\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Window.cpp">
-      <Filter>Source Files\Graphics</Filter>
+      <Filter>Source Files\Backend\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="GameObject.cpp">
       <Filter>Source Files\Game\Objects</Filter>
     </ClCompile>
     <ClCompile Include="D3D.cpp">
-      <Filter>Source Files\DirectX</Filter>
+      <Filter>Source Files\Backend\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="Model.cpp">
       <Filter>Source Files\Game\Objects</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files\Game</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MenuScene.cpp">
-      <Filter>Source Files\Scene</Filter>
+      <Filter>Source Files\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="GameScene.cpp">
-      <Filter>Source Files\Scene</Filter>
+      <Filter>Source Files\Game\Scene</Filter>
     </ClCompile>
     <ClCompile Include="SceneManager.cpp">
-      <Filter>Source Files\Scene</Filter>
+      <Filter>Source Files\Game\Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="imgui\imgui_impl_dx11.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Vertices.cpp">
-      <Filter>Source Files\Graphics</Filter>
+    <ClCompile Include="imgui\imgui_impl_win32.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Matrices.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="imgui\imgui.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Maths.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="imgui\imgui_demo.cpp">
+      <Filter>ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="imgui\imgui_draw.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui\imgui_widgets.cpp">
+      <Filter>ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files\Game\Objects</Filter>
     </ClCompile>
     <ClCompile Include="Bounds.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Source Files\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertices.cpp">
+      <Filter>Source Files\Backend\Graphics\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\Backend\Graphics\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Matrices.cpp">
+      <Filter>Source Files\Backend\Graphics\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Backend\Graphics\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\Backend\Graphics\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Locator.cpp">
+      <Filter>Source Files\Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Source Files\Game\Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiManager.cpp">
+      <Filter>Source Files\Backend\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Keyboard.cpp">
+      <Filter>Source Files\Backend\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="Mouse.cpp">
+      <Filter>Source Files\Backend\Inputs</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files\Backend\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMain.cpp">
+      <Filter>Source Files\Backend\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="Maths.cpp">
+      <Filter>Source Files\Backend\DirectX</Filter>
     </ClCompile>
     <ClCompile Include="LevelLoader.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Game\Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -278,13 +353,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="DXTrace.inl">
-      <Filter>Source Files\Debug</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
     </None>
     <None Include="DXGetErrorString.inl">
-      <Filter>Source Files\Debug</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
     </None>
     <None Include="DXGetErrorDescription.inl">
-      <Filter>Source Files\Debug</Filter>
+      <Filter>Source Files\Backend\Debug</Filter>
+    </None>
+    <None Include="..\Data\Level1.json">
+      <Filter>Data\Json</Filter>
     </None>
   </ItemGroup>
 </Project>

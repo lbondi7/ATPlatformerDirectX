@@ -21,51 +21,11 @@ bool GameScene::Init()
 {
 	Locator::GetMisc()->SetClearColour({ 0, 1, 0, 1 });
 
-	std::map<int, std::string> texName;
-	texName[0] = "MrBean";
-	texName[1] = "UV";
-	texName[2] = "Simon";
-
-	Vector poss[11]{ {0, 0, 0},
-		{0, 0, 15},
-		{15, 0, 15},
-		{30, 0, 15},
-		{45, 0, 15},
-		{45, 0, 0},
-		{45, 0, -15},
-		{30, 0, -15},
-		{15, 0, -15},
-		{0, 0, -15},
-	    {22, -5, 0}
-	};
-
-	Vector scales[11]{ {5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{5, 1, 5},
-		{50, 2, 50} 
-	};
-
 	for (int i = 0; i < 11; i++)
 	{
 		GameObject* go = new GameObject();
 		go->Init();
 		go->AddModel();
-		//go->GetModel()->ModelType("cube");
-		//go->GetModel()->Texture(texName[1]);
-		//go->GetTransform().SetScale(scales[i]);
-		//go->GetTransform().SetPos(poss[i]);
-		//go->SetTag(GameObjectTag::GROUND);
-		//if (i == 10)
-		//{
-		//	go->SetTag(GameObjectTag::KILLBOX);
-		//}
 
 		pGObjects.emplace_back(go);
 		mObjNum++;
@@ -78,7 +38,7 @@ bool GameScene::Init()
 	pPlayer->Init();
 	pPlayer->AddModel();
 	pPlayer->GetModel()->ModelType("iso");
-	pPlayer->GetModel()->Texture(texName[2]);
+	pPlayer->GetModel()->Texture("Simon");
 	pPlayer->GetTransform().SetScale(1, 1, 1);
 	pPlayer->GetTransform().SetPos(0, 3, 0);
 	pPlayer->AddPlayer();
@@ -87,7 +47,7 @@ bool GameScene::Init()
 
 	mCam = std::make_unique<Camera>();
 	mCam->Init();
-	mCam->GetTransform().SetPos(0, 4, -5);
+	mCam->GetTransform().SetPos(-10, 15, -10);
 	mCam->GetTransform().SetRot(0, 0, 0);
 
 	return true;
@@ -105,19 +65,6 @@ Scene::CurrentScene GameScene::Update()
 		changeScene = GameScene::ChangeScene::MENU;
 	}
 
-	for (std::vector<GameObject*>::iterator it = pGObjects.begin(); it != pGObjects.end(); ++it) {
-		(*it)->Update(mWorldMatrix);
-	}
-
-	//if (mGObjects[1].GetBB().IsInside(mGObjects[0].GetBB().mBBMin, mGObjects[0].GetBB().mBBMax))
-	//{
-	//	Locator::GetMisc()->SetClearColour({ 1, 1, 1, 1 });
-	//}
-	//else
-	//{
-	//	Locator::GetMisc()->SetClearColour({ 1, 1, 0, 1 });
-	//}
-
 	isColliding = false;
 	for (size_t i = 0; i < mObjNum; ++i)
 	{
@@ -133,33 +80,74 @@ Scene::CurrentScene GameScene::Update()
 				break;
 			}
 
-			auto playerDim = VectorSub(pPlayer->GetBB().mBBMax, pPlayer->GetBB().mBBMin);
-			auto objDim = VectorSub(pGObjects[i]->GetBB().mBBMax, pGObjects[i]->GetBB().mBBMin);
+			if ((pPlayer->GetTransform().GetPosY() > VectorY(pGObjects[i]->GetBB().mBBMax)) &&
+				VectorY(pPlayer->GetPlayer()->GetVelocity()) < 0)
+			{
+				pPlayer->GetTransform().SetPosY(pPlayer->GetTransform().GetPosY() + 0.001f);
+				pPlayer->GetTransform().SetPosY(
+					pPlayer->GetTransform().GetPosY() -
+					VectorY(pPlayer->GetPlayer()->GetVelocity()) *
+					Locator::GetTimer()->DeltaTime());
 
-			auto difference = DirectX::XMVectorSubtract(
-				pPlayer->GetTransform().GetPos(), 
-				pGObjects[i]->GetTransform().GetPos());
+				pPlayer->GetPlayer()->SetState(PlayerMotionState::GROUNDED);
+			}
+			else 
+			{
+				pPlayer->GetTransform().SetPosX(
+					pPlayer->GetTransform().GetPosX() - VectorX(pPlayer->GetPlayer()->GetVelocity())
+					* Locator::GetTimer()->DeltaTime());
 
-			//playerDim = VectorMultiplyByFloat(playerDim, 0.5f);
-			//objDim = VectorMultiplyByFloat(objDim, 0.5f);
-			//difference = DirectX::XMVector3Normalize(difference);
-			//difference = DirectX::XMVectorMultiply(difference, VectorAdd(playerDim, objDim));
-			////difference = VectorMultiplyByFloat(difference, 0.5f);
-			//pPlayer->GetTransform().SetPos(VectorAdd(pGObjects[i]->GetTransform().GetPos(), difference));
-			pPlayer->GetTransform().SetPos(VectorAdd(pGObjects[i]->GetTransform().GetPos(), 
-				{ DirectX::XMVectorGetX(difference), 
-				((DirectX::XMVectorGetY(playerDim) - 0.1f) + (DirectX::XMVectorGetY(objDim) - 0.1f)) * 0.5f,
-				DirectX::XMVectorGetZ(difference) }));
+				pPlayer->GetTransform().SetPosZ(
+					pPlayer->GetTransform().GetPosZ() - VectorZ(pPlayer->GetPlayer()->GetVelocity())
+					* Locator::GetTimer()->DeltaTime());
+
+				auto vec = DirectX::XMVector3Normalize(pPlayer->GetPlayer()->GetVelocity());
+				pPlayer->GetTransform().SetPosX(pPlayer->GetTransform().GetPosX() - (VectorX(vec) * 0.1f));
+				pPlayer->GetTransform().SetPosZ(pPlayer->GetTransform().GetPosZ() - (VectorZ(vec) * 0.1f));
+			}
+				////pPlayer->GetTransform().SetPosX(pPlayer->GetTransform().GetPosX() - 0.01f);
+				//pPlayer->GetTransform().SetPosX(
+				//	pPlayer->GetTransform().GetPosX() - VectorX(pPlayer->GetPlayer()->GetVelocity())
+				//	* Locator::GetTimer()->DeltaTime());
+				////pPlayer->GetTransform().SetPosZ(pPlayer->GetTransform().GetPosZ() - 0.01f);
+				//pPlayer->GetTransform().SetPosZ(
+				//	pPlayer->GetTransform().GetPosZ() - VectorZ(pPlayer->GetPlayer()->GetVelocity())
+				//	* Locator::GetTimer()->DeltaTime());
+
+				//auto vec = DirectX::XMVector3Normalize(pPlayer->GetPlayer()->GetVelocity());
+				//pPlayer->GetTransform().SetPosX(pPlayer->GetTransform().GetPosX() - (VectorX(vec) * 0.1f));
+				//pPlayer->GetTransform().SetPosZ(pPlayer->GetTransform().GetPosZ() - (VectorZ(vec) * 0.1f));
 
 
-			pPlayer->GetPlayer()->SetState(PlayerMotionState::GROUNDED);
+			//auto playerDim = VectorSub(pPlayer->GetBB().mBBMax, pPlayer->GetBB().mBBMin);
+			//auto objDim = VectorSub(pGObjects[i]->GetBB().mBBMax, pGObjects[i]->GetBB().mBBMin);
+
+			//auto difference = DirectX::XMVectorSubtract(
+			//	pPlayer->GetTransform().GetPos(), 
+			//	pGObjects[i]->GetTransform().GetPos());
+
+			////playerDim = VectorMultiplyByFloat(playerDim, 0.5f);
+			////objDim = VectorMultiplyByFloat(objDim, 0.5f);
+			////difference = DirectX::XMVector3Normalize(difference);
+			////difference = DirectX::XMVectorMultiply(difference, VectorAdd(playerDim, objDim));
+			////pPlayer->GetTransform().SetPos(VectorAdd(pGObjects[i]->GetTransform().GetPos(), difference));
+			////pPlayer->GetTransform().SetPos(VectorAdd(pGObjects[i]->GetTransform().GetPos(), 
+			////	{ DirectX::XMVectorGetX(difference), 
+			////	((DirectX::XMVectorGetY(playerDim) - 0.1f) + (DirectX::XMVectorGetY(objDim) - 0.1f)) * 0.5f,
+			////	DirectX::XMVectorGetZ(difference) }));
+
+			//pPlayer->GetPlayer()->SetState(PlayerMotionState::GROUNDED);
 			break;
 		}
 	}
 
-	if (!isColliding)
-	{
-		pPlayer->GetPlayer()->SetState(PlayerMotionState::FALLING);
+	//if (!isColliding)
+	//{
+	//	pPlayer->GetPlayer()->SetState(PlayerMotionState::FALLING);
+	//}
+
+	for (std::vector<GameObject*>::iterator it = pGObjects.begin(); it != pGObjects.end(); ++it) {
+		(*it)->Update(mWorldMatrix);
 	}
 
 	mCam->SetLookAt(pPlayer->GetTransform().GetPos());
@@ -169,6 +157,7 @@ Scene::CurrentScene GameScene::Update()
 
 void GameScene::Render()
 {
+
 	for (std::vector<GameObject*>::iterator it = pGObjects.begin(); it != pGObjects.end(); ++it) {
 		(*it)->Render();
 	}
