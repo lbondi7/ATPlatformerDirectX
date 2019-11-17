@@ -17,7 +17,7 @@ void LevelLoader::LoadObjects(std::vector<GameObject*> objects)
 
 	int numberOfObjects;
 	nlohmann::json shapeJson;
-	std::ifstream shape_file("..//Data//Level1.json");
+	std::ifstream shape_file("..//Data//levels//Level1.json");
 	shape_file >> shapeJson;
 	numberOfObjects = shapeJson["Object Count"];
 
@@ -30,5 +30,4 @@ void LevelLoader::LoadObjects(std::vector<GameObject*> objects)
 		objects[i]->GetTransform().SetPos(object["Position"][0], object["Position"][1], object["Position"][2]);
 		objects[i]->SetTag(tags[object["Tag"]]);
 	}
-	int yh = 0;
 }

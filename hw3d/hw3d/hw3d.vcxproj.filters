@@ -216,6 +216,9 @@
     <ClInclude Include="Maths.h">
       <Filter>Header Files\Backend\DirectX</Filter>
     </ClInclude>
+    <ClInclude Include="Meshes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="LewisException.cpp">

@@ -39,7 +39,7 @@ HRESULT Texture::CreateTextures(const std::string& texture)
 	unsigned int rowPitch;
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
 
-	std::string file = "..//Data//" + texture + ".tga";
+	std::string file = "..//Data//textures//" + texture + ".tga";
 	if (!LoadTarga(file.data(), height, width))
 	{
 		return false;

@@ -13,6 +13,10 @@
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
+static std::mutex meshMutex;
+
+#define ASYNC 1;
+
 Vertices::Vertices()
 {
 	//shapes["cube"] = 0;
@@ -20,50 +24,98 @@ Vertices::Vertices()
 
 HRESULT Vertices::CreateBuffer(const std::string& shapeName)
 {
-	HRESULT hr;
+	HRESULT hr = S_OK;
 	model[shapeName] = bufferCount;
-	pVertexBuffers.resize(model.size());
-	pIndexBuffers.resize(model.size());
-	stride.resize(model.size());
-	offset.resize(model.size());
-	indicesSize.resize(model.size());
-	vertexCount.resize(model.size());
-	vertices.resize(model.size());
-	//create Vertex Buffer
+	bufferCount++;
+
+#if ASYNC 
+	meshMutex.lock();
+	m_Meshes.resize(model.size());
+	meshMutex.unlock();
+
+	//CreateBuffers(&m_Meshes, mod, name);
+	const auto& mod = model[shapeName];
+	m_Futures.push_back(std::async(std::launch::async , CreateBuffers, &m_Meshes, mod, shapeName));
+
+#else
+	m_Meshes.resize(model.size());
 	if (FAILED(hr = CreateVertexBuffer(shapeName)))
 	{
 		return hr;
 	}
-	
+
 	// create Index Buffer
 	if (FAILED(hr = CreateIndexBuffer(shapeName)))
 	{
 		return hr;
 	}
-
-	bufferCount++;
+#endif
+	//pVertexBuffers.resize(model.size());
+	//pIndexBuffers.resize(model.size());
+	//m_Strides.resize(model.size());
+	//m_Offsets.resize(model.size());
+	//m_VertexCounts.resize(model.size());
+	//m_Vertices.resize(model.size());
+	////create Vertex Buffer
+	//if (FAILED(hr = CreateVertexBuffer(shapeName)))
+	//{
+	//	return hr;
+	//}
+	//
+	//// create Index Buffer
+	//if (FAILED(hr = CreateIndexBuffer(shapeName)))
+	//{
+	//	return hr;
+	//}
 	return hr;
 }
 
-HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
+HRESULT Vertices::CreateBuffers(std::vector<Mesh>* meshes, int num, std::string meshName)
 {
-	vertexCount[model[modelTag]] = 0;
+	HRESULT hr;
 
-	//nlohmann::json shapeJson;
-	//std::ifstream shape_file("..//Data//" + shapeName + ".json");
-	//shape_file >> shapeJson;
+	// create Vertex Buffer
+	if (FAILED(hr = CreateVertexBuffer(meshes, num, meshName)))
+	{
+		return hr;
+	}
 
-	//vertexCount[shapes[shapeName]] = shapeJson["Vertex Count"];
-	//VertexType* vertices = new VertexType[vertexCount[shapes[shapeName]]];
-	//for (int i = 0; i < vertexCount[shapes[shapeName]]; ++i) {
-	//auto vertex = shapeJson["Vertecies"]["Position"][std::to_string(i)];
-	////auto colour = shapeJson["Vertecies"]["Colour"][std::to_string(i)];
-	//auto tex = shapeJson["Vertecies"]["Texture"][std::to_string(i)];
-	//auto norm = shapeJson["Vertecies"]["Normal"][std::to_string(i)];
+	// create Index Buffer
+	if (FAILED(hr = CreateIndexBuffer(meshes, num)))
+	{
+		return hr;
+	}
 
-	//vertices[i] = { vertex[0],vertex[1],vertex[2], 0.0f, tex[0],tex[1], norm[0],norm[1],norm[2], 0.0f };
-	//}
+	return hr;
+}
 
+HRESULT Vertices::CreateVertexBuffer(std::vector<Mesh>* meshes, int num, const std::string& modelTag)
+{	
+		std::vector<VertexType> vert;
+
+		loadOBJ(modelTag, vert, meshes, num);
+
+		D3D11_BUFFER_DESC vbd = {};
+		vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		vbd.Usage = D3D11_USAGE_DEFAULT;
+		vbd.CPUAccessFlags = 0u;
+		vbd.MiscFlags = 0u;
+		vbd.ByteWidth = sizeof(VertexType) * vert.size();
+		//vbd.ByteWidth = sizeof(VertexType) * m_VertexCounts[num];
+		vbd.StructureByteStride = sizeof(VertexType);
+		D3D11_SUBRESOURCE_DATA vsd = {};
+		vsd.pSysMem = vert.data();
+	
+		std::lock_guard<std::mutex> lock(meshMutex);
+		(*meshes)[num].stride = sizeof(VertexType);
+		(*meshes)[num].offset = 0u;
+		(*meshes)[num].vertexCount = vert.size();
+	
+		return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &(*meshes)[num].vertexBuffer);
+}
+
+void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num)
+{
 	struct Faces
 	{
 		int vIndex;
@@ -71,15 +123,20 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 		int nIndex;
 	};
 
-	std::vector<DirectX::XMFLOAT2> texs;
-	std::vector<Vector> norm;
+	std::vector<Vector> verticess;
+	size_t maxi = verticess.max_size();
+	size_t maxu = verticess.capacity();
+	std::vector<DirectX::XMFLOAT2> textureCoords;
+	std::vector<Vector> normals;
 	std::vector<std::vector<Faces>> faces;
 	std::vector<Faces> face;
 	int vertPerFace = 3;
 	face.reserve(vertPerFace);
 	bool skip = false;
 	std::fstream file;
-	file.open("..//Data//" + modelTag + ".obj");
+	file.open("..//Data//models//" + modelTag + ".obj");
+	bool isUV = false;
+	bool isNorm = false;
 	if (file.is_open())
 	{
 		//std::stringstream ss;
@@ -99,27 +156,29 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 				case ' ':
 				{
 					file >> x >> y >> z;
-					vertices[model[modelTag]].push_back({ x, y, z});
+					verticess.push_back({ x, y, z });
 					break;
 				}
 				case 't':
 				{
+					isUV = true;
 					file.get(lineChar);
 					if (lineChar != ' ')
 						break;
 
 					file >> x >> y;
-					texs.push_back({ 1 - x, 1 - y });
+					textureCoords.push_back({ 1 - x, 1 - y });
 					break;
 				}
 				case 'n':
 				{
+					isNorm = true;
 					file.get(lineChar);
 					if (lineChar != ' ')
 						break;
 
 					file >> x >> y >> z;
-					norm.push_back({ x, y, z});
+					normals.push_back({ x, y, z });
 					break;
 				}
 				}
@@ -133,33 +192,34 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 					{
 						file >> x;
 						file.get(lineChar);
-						file >> y;
+						if (isUV)
+							file >> y;
+						else
+							y = -1;
 						file.get(lineChar);
-						file >> z;
+						if (isNorm)
+							file >> z;
+						else
+							z = -1;
 						face.push_back({ (int)x, (int)y, (int)z });
 					}
 					faces.push_back(face);
 					face.clear();
-					face.reserve(2);
+					face.reserve(vertPerFace);
 				}
 			}
 		}
 		file.close();
 	}
 
-	//std::reverse(std::begin(vertices[model[modelTag]]), std::end(vertices[model[modelTag]]));
-	//std::reverse(std::begin(texs), std::end(texs));
-	//std::reverse(std::begin(norm), std::end(norm));
-	//std::reverse(std::begin(faces), std::end(faces));
-	vertexCount[model[modelTag]] = faces.size() * vertPerFace;
-	std::vector<VertexType> vert;
-	//VertexType* vertices = new VertexType[vertexCount[shapes[shapeName]]];
-	//std::vector<VertexType>vertices;
-	//vertices.resize(vertexCount[shapes[shapeName]]);
+	//m_VertexCounts[model[modelTag]] = faces.size() * vertPerFace;
+
 	size_t l = 0;
 	float vIn;
 	float vtIn;
 	float vnIn;
+	DirectX::XMFLOAT2 t;
+	Vector n;
 
 	for (size_t i = 0; i < faces.size(); i++)
 	{
@@ -169,65 +229,34 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 			vtIn = faces[i][j].tIndex - 1;
 			vnIn = faces[i][j].nIndex - 1;
 
-			//vertices[l] = { DirectX::XMVectorGetX(vert[vIn]), DirectX::XMVectorGetY(vert[vIn]), DirectX::XMVectorGetZ(vert[vIn]), 0.0f,
-			//	texs[vtIn].x, texs[vtIn].y,
-			//	 DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn]), 0.0f};
-			//
-			vert.push_back({DirectX::XMVectorGetX(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetY(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetZ(vertices[model[modelTag]][vIn]), 0.0f,
-			texs[vtIn].x, texs[vtIn].y,
-			 DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn]), 0.0f });
+			vtIn >= 0 ? t = textureCoords[vtIn] : t = { 0.0f, 0.0f };
+			vnIn >= 0 ? n = normals[vnIn] : n = { 0.0f, 0.0f, 0.0f };
+
+			vert.push_back({ DirectX::XMVectorGetX(verticess[vIn]), DirectX::XMVectorGetY(verticess[vIn]), DirectX::XMVectorGetZ(verticess[vIn]), 0.0f,
+				t.x, t.y,
+				DirectX::XMVectorGetX(n), DirectX::XMVectorGetY(n), DirectX::XMVectorGetZ(n), 0.0f });
+
+
+			//vert.push_back({DirectX::XMVectorGetX(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetY(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetZ(vertices[model[modelTag]][vIn]), 0.0f,
+			//texs[vtIn].x, texs[vtIn].y,
+			// DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn]), 0.0f });
 
 			++l;
 		}
 	}
 
-	//for (size_t i = 0; i < vertexCount[shapes[shapeName]]; i += 3)
-	//{
-	//	auto v0 = vertices[i];
-	//	auto v1 = vertices[i + 1];
-	//	auto v2 = vertices[i + 2];
-	//	const auto p0 = DirectX::XMLoadFloat3(&v0.pos.position);
-	//	const auto p1 = DirectX::XMLoadFloat3(&v1.pos.position);
-	//	const auto p2 = DirectX::XMLoadFloat3(&v2.pos.position);
-	//	const auto n = DirectX::XMVector3Normalize(DirectX::XMVector3Cross(DirectX::XMVectorSubtract(p0, p1), DirectX::XMVectorSubtract(p0, p2)));
-	//	DirectX::XMStoreFloat3(&v0.norm.normal, n);
-	//	DirectX::XMStoreFloat3(&v1.norm.normal, n);
-	//	DirectX::XMStoreFloat3(&v2.norm.normal, n);
-	//	vertices[i] = { vertices[i].pos,
-	//		vertices[i].txt.texs,
-	//       DirectX::XMFLOAT3(v0.norm.normal.z, v0.norm.normal.y, v0.norm.normal.x) };
-	//	vertices[i + 1] = { vertices[i + 1].pos,
-	//        vertices[i  + 1].txt.texs,
-	//        DirectX::XMFLOAT3(v1.norm.normal.z, v1.norm.normal.y, v1.norm.normal.x) };
-	//	vertices[i + 2] = { vertices[i + 2].pos,
-	//        vertices[i + 2].txt.texs,
-	//        DirectX::XMFLOAT3(v2.norm.normal.z, v2.norm.normal.y, v2.norm.normal.x) };
-	//}
-
-	//std::reverse(std::begin(vert), std::end(vert));
-
-	D3D11_BUFFER_DESC vbd = {};
-	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vbd.Usage = D3D11_USAGE_DEFAULT;
-	vbd.CPUAccessFlags = 0u;
-	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = sizeof(VertexType) * vertexCount[model[modelTag]];
-	vbd.StructureByteStride = sizeof(VertexType);
-	D3D11_SUBRESOURCE_DATA vsd = {};
-//	const VertexType* verts = &*vertices->cbegin();
-	vsd.pSysMem = vert.data();
-
-	stride[model[modelTag]] = sizeof(VertexType);
-	offset[model[modelTag]] = 0u;
-
-	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &pVertexBuffers[model[modelTag]]);
+	(*meshes)[num].vertices = verticess;
 }
 
-HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
+HRESULT Vertices::CreateIndexBuffer(std::vector<Mesh>* meshes, int num)
 {
-	unsigned short* indices = new unsigned short[vertexCount[model[shapeName]]];
+	meshMutex.lock();
+	auto size = (*meshes)[num].vertexCount;
+	meshMutex.unlock();
 
-	for (int i = 0; i < vertexCount[model[shapeName]]; i++)
+	unsigned short* indices = new unsigned short[size];
+
+	for (int i = 0; i < size; i++)
 	{
 		indices[i] = i;
 	}
@@ -237,13 +266,58 @@ HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
 	ibd.Usage = D3D11_USAGE_DEFAULT;
 	ibd.CPUAccessFlags = 0u;
 	ibd.MiscFlags = 0u;
-	ibd.ByteWidth = sizeof(unsigned short) * vertexCount[model[shapeName]];
+	ibd.ByteWidth = sizeof(unsigned short) * size;
 	ibd.StructureByteStride = sizeof(unsigned short);
 	D3D11_SUBRESOURCE_DATA isd = {};
 	isd.pSysMem = indices;
-	indicesSize[model[shapeName]] = vertexCount[model[shapeName]];
 
-	return Locator::GetD3D()->GetDevice()->CreateBuffer(&ibd, &isd, &pIndexBuffers[model[shapeName]]);
+	std::lock_guard<std::mutex> lock(meshMutex);
+	return Locator::GetD3D()->GetDevice()->CreateBuffer(&ibd, &isd, &(*meshes)[num].indexBuffer);
+}
+
+HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
+{
+	std::vector<VertexType> vert;
+	const auto& num = model[modelTag];
+	loadOBJ(modelTag, vert, &m_Meshes, num);
+
+	D3D11_BUFFER_DESC vbd = {};
+	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	vbd.Usage = D3D11_USAGE_DEFAULT;
+	vbd.CPUAccessFlags = 0u;
+	vbd.MiscFlags = 0u;
+	vbd.ByteWidth = sizeof(VertexType) * vert.size();
+	vbd.StructureByteStride = sizeof(VertexType);
+	D3D11_SUBRESOURCE_DATA vsd = {};
+	vsd.pSysMem = vert.data();
+
+	m_Meshes[num].stride = sizeof(VertexType);
+	m_Meshes[num].offset = 0u;
+	m_Meshes[num].vertexCount = vert.size();
+
+	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &m_Meshes[num].vertexBuffer);
+}
+
+HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
+{
+	unsigned short* indices = new unsigned short[m_Meshes[model[shapeName]].vertexCount];
+
+	for (int i = 0; i < m_Meshes[model[shapeName]].vertexCount; i++)
+	{
+		indices[i] = i;
+	}
+
+	D3D11_BUFFER_DESC ibd = {};
+	ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+	ibd.Usage = D3D11_USAGE_DEFAULT;
+	ibd.CPUAccessFlags = 0u;
+	ibd.MiscFlags = 0u;
+	ibd.ByteWidth = sizeof(unsigned short) * m_Meshes[model[shapeName]].vertexCount;
+	ibd.StructureByteStride = sizeof(unsigned short);
+	D3D11_SUBRESOURCE_DATA isd = {};
+	isd.pSysMem = indices;
+
+	return Locator::GetD3D()->GetDevice()->CreateBuffer(&ibd, &isd, &m_Meshes[model[shapeName]].indexBuffer);
 }
 
 int Vertices::GetBufferNum(const std::string& shapeName)
@@ -252,32 +326,63 @@ int Vertices::GetBufferNum(const std::string& shapeName)
 	return bufNum;
 }
 
+
 ID3D11Buffer*& Vertices::GetVertexBuffer(const std::string& shapeName)
 {
-	return pVertexBuffers[GetBufferNum(shapeName)];
+	return m_Meshes[model[shapeName]].vertexBuffer;
 }
 
 ID3D11Buffer*& Vertices::GetIndexBuffer(const std::string& shapeName)
 {
-	return pIndexBuffers[GetBufferNum(shapeName)];
+	return m_Meshes[model[shapeName]].indexBuffer;
 }
 
 const UINT& Vertices::GetStride(const std::string& shapeName)
 {
-	return stride[GetBufferNum(shapeName)];
+	return m_Meshes[model[shapeName]].stride;
 }
 
 const UINT& Vertices::GetOffset(const std::string& shapeName)
 {
-	return offset[GetBufferNum(shapeName)];
+	return m_Meshes[model[shapeName]].offset;
 }
 
 unsigned int Vertices::GetIndicesSize(const std::string& shapeName)
 {
-	return indicesSize[GetBufferNum(shapeName)];
+	return m_Meshes[model[shapeName]].vertexCount;
 }
 
 const std::vector<Vector>& Vertices::GetVertices(const std::string& modelName)
 {
-	return vertices[model[modelName]];
+	return m_Meshes[model[modelName]].vertices;
 }
+
+//ID3D11Buffer*& Vertices::GetVertexBuffer(const std::string& shapeName)
+//{
+//	return pVertexBuffers[model[shapeName]];
+//}
+//
+//ID3D11Buffer*& Vertices::GetIndexBuffer(const std::string& shapeName)
+//{
+//	return pIndexBuffers[model[shapeName]];
+//}
+//
+//const UINT& Vertices::GetStride(const std::string& shapeName)
+//{
+//	return m_Strides[GetBufferNum(shapeName)];
+//}
+//
+//const UINT& Vertices::GetOffset(const std::string& shapeName)
+//{
+//	return m_Offsets[model[shapeName]];
+//}
+//
+//unsigned int Vertices::GetIndicesSize(const std::string& shapeName)
+//{
+//	return m_VertexCounts[model[shapeName]];
+//}
+//
+//const std::vector<Vector>& Vertices::GetVertices(const std::string& modelName)
+//{
+//	return m_Vertices[model[modelName]];
+//}

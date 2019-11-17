@@ -1,0 +1,45 @@
+{
+  "Object Count": 5,
+  "Objects": {
+    "0": {
+      "Position": [ 0, 0, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 50, 1, 50 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "1": {
+      "Position": [ 0, 3, 15 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 5, 2, 5 ],
+      "Model": "cube",
+      "Texture": "MrBean",
+      "Tag": "ground"
+    },
+    "2": {
+      "Position": [ 20, 4, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 1, 1, 1 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "ground"
+    },
+    "3": {
+      "Position": [ 0, 4, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 1, 1, 1 ],
+      "Model": "helli3",
+      "Texture": "UV",
+      "Tag": "ground"
+    },
+    "4": {
+      "Position": [22, -15, 0 ],
+      "Rotation": [ 0, 0, 0 ],
+      "Scale": [ 50, 5, 50 ],
+      "Model": "cube",
+      "Texture": "Simon",
+      "Tag": "killbox"
+    }
+  }
+}

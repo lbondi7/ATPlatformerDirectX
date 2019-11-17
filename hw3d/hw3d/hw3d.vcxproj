@@ -159,6 +159,7 @@
     <ClInclude Include="LevelLoader.h" />
     <ClInclude Include="Maths.h" />
     <ClInclude Include="Matrices.h" />
+    <ClInclude Include="Meshes.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Vertices.h" />

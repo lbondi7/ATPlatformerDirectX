@@ -1,11 +1,13 @@
 #pragma once
 #include "Maths.h"
+#include "Meshes.h"
 
 #include <d3d11.h>
 #include <wrl.h>
 #include <vector> 
 #include <map>
 #include <string>
+#include <future>
 
 class Vertices
 {
@@ -39,6 +41,8 @@ public:
 
 	HRESULT CreateBuffer(const std::string& shapeName);
 
+	int GetBufferNum(const std::string& shapeName);
+
 	ID3D11Buffer*& GetVertexBuffer(const std::string& modelName);
 	ID3D11Buffer*& GetIndexBuffer(const std::string& modelName);
 	const UINT& GetStride(const std::string& modelName);
@@ -50,17 +54,23 @@ public:
 
 private:
 
-	HRESULT CreateVertexBuffer(const std::string& shapeName);
+	static HRESULT CreateBuffers(std::vector<Mesh>* meshes, int num, std::string meshName);
+	static HRESULT CreateVertexBuffer(std::vector<Mesh>* meshes, int num, const std::string& meshName);
+	static HRESULT CreateIndexBuffer(std::vector<Mesh>* meshes, int num);
+	HRESULT CreateVertexBuffer(const std::string& modelTag);
 	HRESULT CreateIndexBuffer(const std::string& shapeName);
-	int GetBufferNum(const std::string& shapeName);
+	static void loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num);
+
+
+	std::vector<Mesh> m_Meshes;
 
 	std::vector<ID3D11Buffer*> pVertexBuffers;
 	std::vector<ID3D11Buffer*> pIndexBuffers;
-	std::vector<unsigned int> indicesSize;
-	std::vector<UINT> stride;
-	std::vector<UINT> offset;
-	std::vector<int> vertexCount;
-	std::vector<std::vector<Vector>> vertices;
+	std::vector<uint32_t> m_Strides;
+	std::vector<uint32_t> m_Offsets;
+	std::vector<int> m_VertexCounts;
+	std::vector<std::vector<Vector>> m_Vertices;
+	std::vector<std::future<HRESULT>> m_Futures;
 
 	int bufferCount = 0;
 

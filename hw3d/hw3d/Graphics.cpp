@@ -112,6 +112,9 @@ Graphics::Graphics( HWND hWnd )
 
 	Locator::GetVertices()->CreateBuffer("cube");
 	Locator::GetVertices()->CreateBuffer("iso");
+	Locator::GetVertices()->CreateBuffer("Teapot");
+	Locator::GetVertices()->CreateBuffer("helli2");
+	Locator::GetVertices()->CreateBuffer("helli3");
 	Locator::GetTexture()->CreateTextures("Simon");
 	Locator::GetTexture()->CreateTextures("UV");
 	Locator::GetTexture()->CreateTextures("MrBean");
