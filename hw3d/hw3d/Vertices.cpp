@@ -109,7 +109,7 @@ HRESULT Vertices::CreateVertexBuffer(std::vector<Mesh>* meshes, int num, const s
 		std::lock_guard<std::mutex> lock(meshMutex);
 		(*meshes)[num].stride = sizeof(VertexType);
 		(*meshes)[num].offset = 0u;
-		(*meshes)[num].vertexCount = vert.size();
+		//(*meshes)[num].vertexCount = vert.size();
 	
 		return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &(*meshes)[num].vertexBuffer);
 }
@@ -212,7 +212,14 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::Vertex
 		file.close();
 	}
 
-	//m_VertexCounts[model[modelTag]] = faces.size() * vertPerFace;
+#if ASYNC
+	meshMutex.lock();
+	(*meshes)[num].indexCount = faces.size() * vertPerFace;
+	(*meshes)[num].vertexCount = verticess.size();
+	meshMutex.unlock();
+#else
+	(*meshes)[num].indexCount = faces.size() * vertPerFace;
+#endif
 
 	size_t l = 0;
 	float vIn;
@@ -245,13 +252,16 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::Vertex
 		}
 	}
 
+#if ASYNC
+	std::lock_guard<std::mutex> lock(meshMutex);
+#endif
 	(*meshes)[num].vertices = verticess;
 }
 
 HRESULT Vertices::CreateIndexBuffer(std::vector<Mesh>* meshes, int num)
 {
 	meshMutex.lock();
-	auto size = (*meshes)[num].vertexCount;
+	auto size = (*meshes)[num].indexCount;
 	meshMutex.unlock();
 
 	unsigned short* indices = new unsigned short[size];
@@ -349,7 +359,7 @@ const UINT& Vertices::GetOffset(const std::string& shapeName)
 
 unsigned int Vertices::GetIndicesSize(const std::string& shapeName)
 {
-	return m_Meshes[model[shapeName]].vertexCount;
+	return m_Meshes[model[shapeName]].indexCount;
 }
 
 const std::vector<Vector>& Vertices::GetVertices(const std::string& modelName)

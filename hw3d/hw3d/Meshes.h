@@ -8,8 +8,9 @@ struct Mesh
 {
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	UINT stride;
-	UINT offset;
-	int vertexCount;
+	uint32_t stride;
+	uint32_t offset;
+	uint32_t vertexCount;
+	uint32_t indexCount;
 	std::vector<Vector> vertices;
 };

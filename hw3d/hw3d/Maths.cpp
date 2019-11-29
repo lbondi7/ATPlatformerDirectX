@@ -24,7 +24,7 @@ Vector LewisMath::VectorMultiplyByFloat(const Vector& vec1, float val)
 
 Vector LewisMath::VectorTransform(const Vector& vec1, const Matrix& mat)
 {
-	return XMVector3Transform(vec1, mat);
+	return XMVector4Transform(vec1, mat);
 }
 
 const Matrix& LewisMath::MatrixFromX(float x)

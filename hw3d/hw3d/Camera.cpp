@@ -15,8 +15,8 @@ Camera::~Camera()
 void Camera::Init()
 {
 	mViewMatrix = &Locator::GetD3D()->GetViewMatrix();
-	offset = { 0, 1, -5, 0 };
-	up = { 0, 1, 0, 0 };
+	offset = { 0.0f, 2.0f, -7.0f, 0 };
+	up = { 0.0f, 1.0f, 0.0f, 0.0f };
 }
 
 void Camera::Update()
@@ -57,12 +57,11 @@ void Camera::Update()
 	////const auto pos = VectorTransform(transform.GetPos(),
 	////	XMMatrixRotationRollPitchYaw(phi, -theta, 0.0f));
 
-	rotationMatrix = MatrixFromVector(up);
-	auto hey = VectorSub(lookAtPos, offset);
-	const auto pos = VectorTransform(hey, rotationMatrix);
-
-	*mViewMatrix = XMMatrixLookAtLH(pos, lookAtPos, 
-		up) * XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad());
+	rotationMatrix.r->m128_f32[2] *= -1.0f;
+	const auto pos = VectorTransform(offset, rotationMatrix);
+	auto hey = VectorAdd(lookAtPos, pos);
+	*mViewMatrix = XMMatrixLookAtLH(hey, lookAtPos,
+		up);// *XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad());
 
 }
 

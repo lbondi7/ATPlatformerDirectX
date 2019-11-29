@@ -37,7 +37,7 @@ bool GameScene::Init()
 	pPlayer = std::make_unique<GameObject>();
 	pPlayer->Init();
 	pPlayer->AddModel();
-	pPlayer->GetModel()->ModelType("helli2");
+	pPlayer->GetModel()->ModelType("helli");
 	pPlayer->GetModel()->Texture("Simon");
 	pPlayer->GetTransform().SetScale(1, 1, 1);
 	pPlayer->GetTransform().SetPos(0, 3, 0);
@@ -47,7 +47,7 @@ bool GameScene::Init()
 
 	mCam = std::make_unique<Camera>();
 	mCam->Init();
-	mCam->GetTransform().SetPos(-10, 15, -10);
+	mCam->GetTransform().SetPos(-10, 3, -10);
 	mCam->GetTransform().SetRot(0, 0, 0);
 
 	return true;
@@ -151,7 +151,7 @@ Scene::CurrentScene GameScene::Update()
 	}
 
 	mCam->SetLookAt(pPlayer->GetTransform().GetPos());
-	//mCam->SetRotMatrix(pPlayer->GetMatrix());
+	mCam->SetRotMatrix(pPlayer->GetMatrix());
 	mCam->Update();
 	return Scene::CurrentScene::NONE;
 }

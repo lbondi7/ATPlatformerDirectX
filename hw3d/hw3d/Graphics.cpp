@@ -79,7 +79,7 @@ Graphics::Graphics( HWND hWnd )
 	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
 
 	D3D11_RASTERIZER_DESC rasterDesc = {};
-	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.AntialiasedLineEnable = true;
 	rasterDesc.CullMode = D3D11_CULL_BACK;
 	rasterDesc.DepthBias = 0;
 	rasterDesc.DepthBiasClamp = 0.0f;
@@ -113,8 +113,8 @@ Graphics::Graphics( HWND hWnd )
 	Locator::GetVertices()->CreateBuffer("cube");
 	Locator::GetVertices()->CreateBuffer("iso");
 	Locator::GetVertices()->CreateBuffer("Teapot");
-	Locator::GetVertices()->CreateBuffer("helli2");
-	Locator::GetVertices()->CreateBuffer("helli3");
+	Locator::GetVertices()->CreateBuffer("lambo");
+	Locator::GetVertices()->CreateBuffer("helli");
 	Locator::GetTexture()->CreateTextures("Simon");
 	Locator::GetTexture()->CreateTextures("UV");
 	Locator::GetTexture()->CreateTextures("MrBean");
