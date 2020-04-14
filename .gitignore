@@ -8,7 +8,7 @@
 *.user
 *.userosscache
 *.sln.docstates
-*.obj
+# *.obj
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -63,7 +63,7 @@ StyleCopReport.xml
 *_i.h
 *.ilk
 *.meta
-# *.obj
+#*.obj
 *.iobj
 *.pch
 *.pdb
