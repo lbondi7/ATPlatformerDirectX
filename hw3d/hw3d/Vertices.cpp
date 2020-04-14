@@ -15,7 +15,7 @@ namespace dx = DirectX;
 
 static std::mutex meshMutex;
 
-#define ASYNC 1;
+#define ASYNC false;
 
 Vertices::Vertices()
 {
@@ -113,6 +113,130 @@ HRESULT Vertices::CreateVertexBuffer(std::vector<Mesh>* meshes, int num, const s
 	
 		return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &(*meshes)[num].vertexBuffer);
 }
+
+//void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num)
+//{
+//	struct Faces
+//	{
+//		int vIndex;
+//		int tIndex;
+//		int nIndex;
+//	};
+//
+//	std::vector<Vector> verticess;
+//	size_t maxi = verticess.max_size();
+//	size_t maxu = verticess.capacity();
+//	std::vector<DirectX::XMFLOAT2> textureCoords;
+//	std::vector<Vector> normals;
+//	std::vector<std::vector<Faces>> facesVector;
+//	std::vector<Faces> faces;
+//	int vertPerFace = 3;
+//	faces.reserve(vertPerFace);
+//	bool skip = false;
+//	std::fstream file;
+//	file.open("..//Data//models//" + modelTag + ".obj");
+//	bool hasUV = false;
+//	bool hasNorm = false;
+//	char* line;
+//	std::string l;
+//	if (file.is_open())
+//	{
+//		//std::stringstream ss;
+//		char lineChar;
+//		//ss << file.rdbuf();
+//		float x, y, z;
+//		while (!file.eof())
+//		{
+//			file.get(lineChar);
+//			if (lineChar == 'v')
+//			{
+//				file.get(lineChar);
+//				if (lineChar == ' ')
+//				{
+//					Vector newVec;
+//					file >> newVec.m128_i32[0] >> newVec.m128_i32[1] >> newVec.m128_i32[2];
+//					verticess.push_back(newVec);
+//				}
+//				else if (lineChar == 't')
+//				{
+//					hasUV = true;
+//					Vector newVec;
+//					file >> newVec.m128_i32[0] >> newVec.m128_i32[1];
+//					verticess.push_back(newVec);
+//				}
+//				else if (lineChar == 'n')
+//				{
+//					hasNorm = true;
+//					Vector newVec;
+//					file >> newVec.m128_i32[0] >> newVec.m128_i32[1] >> newVec.m128_i32[2];
+//					verticess.emplace_back(newVec);
+//				}				
+//			}
+//			else if (lineChar == 'f')
+//			{
+//				Faces face;
+//				file >> face.vIndex;
+//				if (hasUV)
+//				{
+//					file.get(lineChar);
+//					file >> face.tIndex;
+//				}
+//				if (hasNorm)
+//				{
+//					file.get(lineChar);
+//					file >> face.nIndex;
+//				}
+//				faces.emplace_back(face);
+//			}
+//		}
+//		file.close();
+//	}
+//
+//#if ASYNC
+//	meshMutex.lock();
+//	(*meshes)[num].indexCount = facesVector.size() * vertPerFace;
+//	(*meshes)[num].vertexCount = verticess.size();
+//	meshMutex.unlock();
+//#else
+//	(*meshes)[num].indexCount = facesVector.size() * vertPerFace;
+//#endif
+//
+//	size_t l = 0;
+//	float vIn;
+//	float vtIn;
+//	float vnIn;
+//	DirectX::XMFLOAT2 t;
+//	Vector n;
+//
+//	for (size_t i = 0; i < facesVector.size(); i++)
+//	{
+//		for (size_t j = 0; j < facesVector[i].size(); j++)
+//		{
+//			vIn = facesVector[i][j].vIndex - 1;
+//			vtIn = facesVector[i][j].tIndex - 1;
+//			vnIn = facesVector[i][j].nIndex - 1;
+//
+//			vtIn >= 0 ? t = textureCoords[vtIn] : t = { 0.0f, 0.0f };
+//			vnIn >= 0 ? n = normals[vnIn] : n = { 0.0f, 0.0f, 0.0f };
+//
+//			vert.push_back({ DirectX::XMVectorGetX(verticess[vIn]), DirectX::XMVectorGetY(verticess[vIn]), DirectX::XMVectorGetZ(verticess[vIn]), 0.0f,
+//				t.x, t.y,
+//				DirectX::XMVectorGetX(n), DirectX::XMVectorGetY(n), DirectX::XMVectorGetZ(n), 0.0f });
+//
+//
+//			//vert.push_back({DirectX::XMVectorGetX(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetY(vertices[model[modelTag]][vIn]), DirectX::XMVectorGetZ(vertices[model[modelTag]][vIn]), 0.0f,
+//			//texs[vtIn].x, texs[vtIn].y,
+//			// DirectX::XMVectorGetX(norm[vnIn]), DirectX::XMVectorGetY(norm[vnIn]), DirectX::XMVectorGetZ(norm[vnIn]), 0.0f });
+//
+//			++l;
+//		}
+//	}
+//
+//#if ASYNC
+//	std::lock_guard<std::mutex> lock(meshMutex);
+//#endif
+//	(*meshes)[num].vertices = verticess;
+//}
 
 void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num)
 {
