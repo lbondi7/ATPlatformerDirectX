@@ -15,7 +15,7 @@ Camera::~Camera()
 void Camera::Init()
 {
 	mViewMatrix = &Locator::GetD3D()->GetViewMatrix();
-	offset = { 0.0f, 2.0f, -7.0f, 0 };
+	offset = { 0.0f, 0.0f, -5.0f, 0 };
 	up = { 0.0f, 1.0f, 0.0f, 0.0f };
 }
 

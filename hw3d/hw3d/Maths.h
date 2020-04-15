@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+
 /*
 A wrapper for the direct x vector. It has 4 values x, y, z and w.
 The last one doesn't need to be used.

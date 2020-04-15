@@ -11,6 +11,7 @@ class Shader;
 class Light;
 class Matrices;
 struct Misc;
+struct ResourceData;
 
 class Locator
 {
@@ -112,6 +113,14 @@ public:
 		graphic = _graphic;
 	}
 
+	static ResourceData* GetResourceData() {
+		return data;
+	}
+
+	static void InitResourceData(ResourceData* _data) {
+		data = _data;
+	}
+
 private:
 	// Static Classes
 	static Keyboard* key;
@@ -125,6 +134,7 @@ private:
 	static Light* light;
 	static Matrices* matrices;
 	static Misc* misc;
+	static ResourceData* data;
 
 	// Static Variables
 	static bool* exit;

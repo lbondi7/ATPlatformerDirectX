@@ -1,6 +1,6 @@
 #pragma once
-#include "Maths.h"
 #include "Meshes.h"
+#include "Constants.h"
 
 #include <d3d11.h>
 #include <wrl.h>
@@ -12,29 +12,7 @@
 class Vertices
 {
 public:
-	struct VertexType
-	{
-		struct
-		{
-			Vector position;
-		}pos;
 
-		struct
-		{
-			float u;
-			float v;
-		}txt;
-
-		struct
-		{
-			Vector normal;
-		}norm;
-
-		//struct
-		//{
-		//	DirectX::XMVECTOR color;
-		//}color;
-	};
 
 	Vertices();
 	~Vertices() = default;
@@ -48,7 +26,9 @@ public:
 	const UINT& GetStride(const std::string& modelName);
 	const UINT& GetOffset(const std::string& modelName);
 	unsigned int GetIndicesSize(const std::string& modelName);
-	const std::vector<Vector>& GetVertices(const std::string& modelName);
+	const std::vector<VertexType>& GetVertices(const std::string& modelName);
+
+	const std::vector<unsigned short>& GetIndices(const std::string& modelName);
 
 	//VertexType* GetVertices();
 
@@ -59,7 +39,7 @@ private:
 	static HRESULT CreateIndexBuffer(std::vector<Mesh>* meshes, int num);
 	HRESULT CreateVertexBuffer(const std::string& modelTag);
 	HRESULT CreateIndexBuffer(const std::string& shapeName);
-	static void loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num);
+	static void loadOBJ(const std::string& modelTag, std::vector<VertexType>& vert, std::vector<Mesh>* meshes, int num);
 
 
 	std::vector<Mesh> m_Meshes;

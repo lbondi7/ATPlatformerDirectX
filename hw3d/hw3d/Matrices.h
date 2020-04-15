@@ -1,6 +1,7 @@
 #pragma once
 
-#include <DirectXMath.h>
+#include "Constants.h"
+
 #include <d3d11.h>
 
 class Matrices
@@ -17,13 +18,6 @@ public:
 
 
 private:
-
-	struct MatrixBufferType
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	};
 
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	ID3D11Buffer* m_matrixBuffer;

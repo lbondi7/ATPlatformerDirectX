@@ -10,7 +10,6 @@ Shader* Locator::shader = nullptr;
 Graphics* Locator::graphic = nullptr;
 Light* Locator::light = nullptr;
 Matrices* Locator::matrices = nullptr;
-
 Misc* Locator::misc = nullptr;
-
 bool* Locator::exit = nullptr;
+ResourceData* Locator::data = nullptr;

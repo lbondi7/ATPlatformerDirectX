@@ -238,7 +238,7 @@ HRESULT Vertices::CreateVertexBuffer(std::vector<Mesh>* meshes, int num, const s
 //	(*meshes)[num].vertices = verticess;
 //}
 
-void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::VertexType>& vert, std::vector<Mesh>* meshes, int num)
+void Vertices::loadOBJ(const std::string& modelTag, std::vector<VertexType>& vert, std::vector<Mesh>* meshes, int num)
 {
 	struct Faces
 	{
@@ -258,7 +258,7 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::Vertex
 	face.reserve(vertPerFace);
 	bool skip = false;
 	std::fstream file;
-	file.open("..//Data//models//" + modelTag + ".obj");
+	file.open("Data//models//" + modelTag + ".obj");
 	bool isUV = false;
 	bool isNorm = false;
 	if (file.is_open())
@@ -379,7 +379,7 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<Vertices::Vertex
 #if ASYNC
 	std::lock_guard<std::mutex> lock(meshMutex);
 #endif
-	(*meshes)[num].vertices = verticess;
+	(*meshes)[num].vectors = verticess;
 }
 
 HRESULT Vertices::CreateIndexBuffer(std::vector<Mesh>* meshes, int num)
@@ -413,21 +413,22 @@ HRESULT Vertices::CreateVertexBuffer(const std::string& modelTag)
 {
 	std::vector<VertexType> vert;
 	const auto& num = model[modelTag];
-	loadOBJ(modelTag, vert, &m_Meshes, num);
+	loadOBJ(modelTag, m_Meshes[num].vertices, &m_Meshes, num);
+	//m_Meshes[num].vertices = vert
 
 	D3D11_BUFFER_DESC vbd = {};
 	vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	vbd.Usage = D3D11_USAGE_DEFAULT;
 	vbd.CPUAccessFlags = 0u;
 	vbd.MiscFlags = 0u;
-	vbd.ByteWidth = sizeof(VertexType) * vert.size();
+	vbd.ByteWidth = sizeof(VertexType) * m_Meshes[num].vertices.size();
 	vbd.StructureByteStride = sizeof(VertexType);
 	D3D11_SUBRESOURCE_DATA vsd = {};
-	vsd.pSysMem = vert.data();
+	vsd.pSysMem = m_Meshes[num].vertices.data();
 
 	m_Meshes[num].stride = sizeof(VertexType);
 	m_Meshes[num].offset = 0u;
-	m_Meshes[num].vertexCount = vert.size();
+	m_Meshes[num].vertexCount = m_Meshes[num].vertices.size();
 
 	return Locator::GetD3D()->GetDevice()->CreateBuffer(&vbd, &vsd, &m_Meshes[num].vertexBuffer);
 }
@@ -436,8 +437,11 @@ HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
 {
 	unsigned short* indices = new unsigned short[m_Meshes[model[shapeName]].vertexCount];
 
+	m_Meshes[model[shapeName]].indices.resize(m_Meshes[model[shapeName]].vertexCount);
+
 	for (int i = 0; i < m_Meshes[model[shapeName]].vertexCount; i++)
 	{
+		m_Meshes[model[shapeName]].indices[i] = i;
 		indices[i] = i;
 	}
 
@@ -450,6 +454,7 @@ HRESULT Vertices::CreateIndexBuffer(const std::string& shapeName)
 	ibd.StructureByteStride = sizeof(unsigned short);
 	D3D11_SUBRESOURCE_DATA isd = {};
 	isd.pSysMem = indices;
+
 
 	return Locator::GetD3D()->GetDevice()->CreateBuffer(&ibd, &isd, &m_Meshes[model[shapeName]].indexBuffer);
 }
@@ -486,9 +491,14 @@ unsigned int Vertices::GetIndicesSize(const std::string& shapeName)
 	return m_Meshes[model[shapeName]].indexCount;
 }
 
-const std::vector<Vector>& Vertices::GetVertices(const std::string& modelName)
+const std::vector<VertexType>& Vertices::GetVertices(const std::string& modelName)
 {
 	return m_Meshes[model[modelName]].vertices;
+}
+
+const std::vector<unsigned short>& Vertices::GetIndices(const std::string& modelName)
+{
+	return m_Meshes[model[modelName]].indices;
 }
 
 //ID3D11Buffer*& Vertices::GetVertexBuffer(const std::string& shapeName)

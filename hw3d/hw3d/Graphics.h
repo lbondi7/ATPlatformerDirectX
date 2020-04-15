@@ -4,9 +4,7 @@
 #include "DxgiInfoManager.h"
 #include "D3D.h"
 #include "Vertices.h"
-
-#include <d3d11.h>
-#include <wrl.h>
+#include "RenderData.h"
 
 #include <vector>
 #include <memory>
@@ -59,6 +57,7 @@ public:
 		const std::string& model,
 		const std::string& texture,
 		const std::string& shader);
+	void Render(const RenderData* renderData, const std::string& texture, const std::string& shader);
 	void EndFrame();
 	void BeginFrame() noexcept;
 	void CheckHResults(HRESULT hr);

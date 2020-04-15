@@ -7,13 +7,13 @@
 #include "Light.h"
 #include "Matrices.h"
 #include "Misc.h"
+#include "ResourceData.h"
+
 #include "imgui//imgui.h"
 #include "imgui//imgui_impl_win32.h"
 #include "imgui//imgui_impl_dx11.h"
 
 #include <sstream>
-//#include <D3Dcompiler.h>
-//#include <DirectXMath.h>
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
@@ -110,14 +110,17 @@ Graphics::Graphics( HWND hWnd )
 	viewport.TopLeftY = 0;
 	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
+
+	Locator::InitResourceData(new ResourceData());
 	Locator::GetVertices()->CreateBuffer("cube");
-	Locator::GetVertices()->CreateBuffer("iso");
-	Locator::GetVertices()->CreateBuffer("Teapot");
-	Locator::GetVertices()->CreateBuffer("lambo");
-	Locator::GetVertices()->CreateBuffer("helli");
-	Locator::GetTexture()->CreateTextures("Simon");
-	Locator::GetTexture()->CreateTextures("UV");
-	Locator::GetTexture()->CreateTextures("MrBean");
+	//Locator::GetVertices()->CreateBuffer("iso");
+	//Locator::GetVertices()->CreateBuffer("Teapot");
+	//Locator::GetVertices()->CreateBuffer("lambo");
+	//Locator::GetVertices()->CreateBuffer("helli");
+	//Locator::GetTexture()->CreateTextures("Simon");
+	Locator::GetResourceData()->LoadImageData("Simon");
+	//Locator::GetTexture()->CreateTextures("UV");
+	//Locator::GetTexture()->CreateTextures("MrBean");
 	Locator::GetShader()->CreateShader("basic");
 	Locator::GetLight()->CreateBuffer();
 	Locator::GetMatrices()->CreateBuffer();
@@ -161,6 +164,65 @@ void Graphics::Render(dx::XMMATRIX wMtrx,const std::string& model, const std::st
 	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
 }
 
+void Graphics::Render(const RenderData* renderData, const std::string& texture, const std::string& shader)
+{
+	//mProjMatrixCopy = dx::XMMatrixTranspose(d3d->GetProjMatrix());
+	//mViewMatrixCopy = d3d->GetViewMatrix();
+	//mViewMatrixCopy = dx::XMMatrixTranspose(mViewMatrixCopy);
+
+	//CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, mViewMatrixCopy, mProjMatrixCopy));
+
+	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, renderData->ConstantBuffer.m_Buffer.GetAddressOf());
+
+	CheckHResults(Locator::GetLight()->MapResource());
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(0, 1, &Locator::GetLight()->GetBuffer());
+
+	//Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u,
+	//	&Locator::GetVertices()->GetVertexBuffer(model),
+	//	&Locator::GetVertices()->GetStride(model),
+	//	&Locator::GetVertices()->GetOffset(model));
+
+	Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u,
+		renderData->VertexBuffer.m_Buffer.GetAddressOf(),
+		&renderData->VertexBuffer.m_Stride,
+		&renderData->VertexBuffer.m_Offset);
+
+	//Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(Locator::GetVertices()->GetIndexBuffer(model), DXGI_FORMAT_R16_UINT, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(renderData->IndexBuffer.m_Buffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, renderData->texture.m_TextureView.GetAddressOf());
+
+	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout(Locator::GetShader()->GetInputLayout(shader));
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetShader(Locator::GetShader()->GetPixelShader(shader), nullptr, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->VSSetShader(Locator::GetShader()->GetVertexShader(shader), nullptr, 0u);
+
+	Locator::GetD3D()->GetDeviceContext()->PSSetSamplers(0, 1, renderData->texture.m_SampleState.GetAddressOf());
+
+	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	//Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndicesSize(model), 0u, 0u);
+	Locator::GetD3D()->GetDeviceContext()->DrawIndexed(renderData->indexCount, 0u, 0u);
+	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
+}
+
+void Graphics::BeginFrame() noexcept
+{
+	ImGui_ImplDX11_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	const float colour[] = { Locator::GetMisc()->GetClearColour().x,
+		Locator::GetMisc()->GetClearColour().w,
+		Locator::GetMisc()->GetClearColour().z,
+		Locator::GetMisc()->GetClearColour().w };
+	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),colour );
+	d3d->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
+}
+
 void Graphics::EndFrame()
 {
 	ImGui::Render();
@@ -183,19 +245,7 @@ void Graphics::EndFrame()
 	}
 }
 
-void Graphics::BeginFrame() noexcept
-{
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
 
-	const float colour[] = { Locator::GetMisc()->GetClearColour().x,
-		Locator::GetMisc()->GetClearColour().w,
-		Locator::GetMisc()->GetClearColour().z,
-		Locator::GetMisc()->GetClearColour().w };
-	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),colour );
-	d3d->GetDeviceContext()->ClearDepthStencilView( pDepStenView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
-}
 
 void Graphics::CheckHResults(HRESULT hr)
 {

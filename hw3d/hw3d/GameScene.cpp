@@ -21,33 +21,35 @@ bool GameScene::Init()
 {
 	Locator::GetMisc()->SetClearColour({ 0, 1, 0, 1 });
 
-	for (int i = 0; i < 11; i++)
-	{
-		GameObject* go = new GameObject();
-		go->Init();
-		go->AddModel();
+	//for (int i = 0; i < 11; i++)
+	//{
+	//	GameObject* go = new GameObject();
+	//	go->Init();
+	//	go->AddModel();
 
-		pGObjects.emplace_back(go);
-		mObjNum++;
-		go = nullptr;
-	}
+	//	pGObjects.emplace_back(go);
+	//	mObjNum++;
+	//	go = nullptr;
+	//}
 
-	LevelLoader::LoadObjects(pGObjects);
+	//pGObjects.resize(11);
+
+	//LevelLoader::LoadObjects(pGObjects);
 
 	pPlayer = std::make_unique<GameObject>();
-	pPlayer->Init();
+	pPlayer->Init("cube");
 	pPlayer->AddModel();
-	pPlayer->GetModel()->ModelType("helli");
+	pPlayer->GetModel()->ModelType("cube");
 	pPlayer->GetModel()->Texture("Simon");
 	pPlayer->GetTransform().SetScale(1, 1, 1);
-	pPlayer->GetTransform().SetPos(0, 3, 0);
+	pPlayer->GetTransform().SetPos(0, 0, 0);
 	pPlayer->AddPlayer();
 	pPlayer->SetTag(GameObjectTag::PLAYER);
 	pGObjects.emplace_back(pPlayer.get());
 
 	mCam = std::make_unique<Camera>();
 	mCam->Init();
-	mCam->GetTransform().SetPos(-10, 3, -10);
+	mCam->GetTransform().SetPos(0, 0, -5);
 	mCam->GetTransform().SetRot(0, 0, 0);
 
 	return true;
@@ -158,7 +160,6 @@ Scene::CurrentScene GameScene::Update()
 
 void GameScene::Render()
 {
-
 	for (std::vector<GameObject*>::iterator it = pGObjects.begin(); it != pGObjects.end(); ++it) {
 		(*it)->Render();
 	}

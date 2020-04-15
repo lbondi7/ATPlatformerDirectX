@@ -2,6 +2,8 @@
 #include "Model.h"
 #include "Player.h"
 #include "Bounds.h"
+#include "RenderData.h"
+#include "Constants.h"
 
 #include <vector>
 
@@ -13,6 +15,7 @@ public:
 	~GameObject();
 
 	void Init();
+	void Init(std::string mod);
 	void AddModel();
 	Model* GetModel();
 
@@ -43,6 +46,9 @@ private:
 	Matrix mObjMatrix;
 	std::vector<Vector> mVerts;
 
+	MatrixBufferType matrices;
+
+	RenderData renderData;
 	Bounds mBB;
 };
 
