@@ -12,21 +12,21 @@ public:
 	void Update();
 	void Render();
 
-	void SetLookAt(const Vector& _lookAt);
+	void SetLookAt(const Vec4& _lookAt);
 	void SetRotMatrix(const Matrix& rotMat);
 
 	Transform& GetTransform();
 
-	void SetOffset(const Vector& _offset);
+	void SetOffset(const Vec4& _offset);
 
 	void SetPhiTheta(float _phi, float _theta);
 
 private:
 
 	DirectX::XMMATRIX* mViewMatrix = nullptr;
-	DirectX::XMMATRIX rotationMatrix;
-	DirectX::XMVECTOR up, lookAtPos, offset;
+	DirectX::XMMATRIX m_RotationMatrix;
+	Vec4 m_Up, m_LookAtPos, m_Offset;
 	float phi = 0, theta = 0;
-	Transform transform;
+	Transform m_Transform;
 };
 

@@ -13,19 +13,19 @@ Model::~Model()
 void Model::Init()
 {
 	mModelMatrix = dx::XMMatrixIdentity();
-	mTransform.SetPos(dx::XMVectorZero());
-	mTransform.SetRot(dx::XMVectorZero());
-	mTransform.SetScale({1.0f, 1.0f, 1.0f, 1.0f});
+	m_Transform.SetPos(dx::XMVectorZero());
+	m_Transform.SetRot(dx::XMVectorZero());
+	m_Transform.SetScale({1.0f, 1.0f, 1.0f, 1.0f});
 }
 
 void Model::Update(Matrix& objMatrix, Transform& goTransform)
 {
-	mTransform.Update();
+	m_Transform.Update();
 
 	mModelMatrix = dx::XMMatrixTranspose(
-	dx::XMMatrixRotationRollPitchYawFromVector(mTransform.GetRotRad())*
-		dx::XMMatrixScalingFromVector(mTransform.GetScale())*
-		dx::XMMatrixTranslationFromVector(mTransform.GetPos()));
+	dx::XMMatrixRotationRollPitchYawFromVector(m_Transform.GetRotRad())*
+		dx::XMMatrixScalingFromVector(m_Transform.GetScale())*
+		dx::XMMatrixTranslationFromVector(m_Transform.GetPos()));
 	mModelMatrix *= objMatrix;
 	//dx::XMMatrixRotationRollPitchYawFromVector(goTransform.GetRotRad()) *
 //dx::XMMatrixRotationRollPitchYaw(goTransform.GetRotXRad(),
@@ -37,12 +37,12 @@ void Model::Update(Matrix& objMatrix, Transform& goTransform)
 
 void Model::Render(const Matrix& worldMatrix)
 {
-	Locator::GetGraphics()->Render(mModelMatrix, mModelType, mTexure, mShader);
+	//Locator::GetGraphics()->Render(mModelMatrix, mModelType, mTexure, mShader);
 }
 
 Transform& Model::GetOffset()
 {
-	return mTransform;
+	return m_Transform;
 }
 
 const std::string& Model::ModelType()

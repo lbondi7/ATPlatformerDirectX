@@ -1,4 +1,5 @@
 #include "D3D.h"
+#include "Constants.h"
 #include "imgui/imgui_impl_dx11.h"
 
 namespace dx = DirectX;
@@ -47,7 +48,7 @@ HRESULT D3D::Init(HWND hWnd)
 	);
 
 	float fieldOfView = (float)dx::XM_PI / 4.0f;
-	float screenAspect = (float)500 / (float)500;
+	float screenAspect = static_cast<float>(WINDOW_WIDTH) / static_cast<float>(WINDOW_HEIGHT);
 
 	//// Create the projection matrix for 3D rendering.
 	//D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);

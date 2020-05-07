@@ -1,63 +1,95 @@
 #include "Bounds.h"
+#include "Utilities.h"
 
 #include <algorithm>
 
 using namespace DirectX;
 
-void Bounds::CalculateBoundingBox(const Vector& pos, const std::vector<Vector>& verts, const Matrix& worldMatrix)
+void Bounds::CalculateBoundingBox(const Vec4& pos, const std::vector<Float3>& verts, Matrix& worldMatrix)
 {
 	XMFLOAT3 minVert = XMFLOAT3(FLT_MAX, FLT_MAX, FLT_MAX);
-	XMFLOAT3 maxVert = XMFLOAT3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
-	//auto length = verts.size();
-	Vector vec;
+	XMFLOAT3 maxVert = XMFLOAT3(FLT_MIN, FLT_MIN, FLT_MIN);
+	m_Min = { FLT_MAX, FLT_MAX, FLT_MAX };
+	m_Max = { -FLT_MAX, -FLT_MAX, -FLT_MAX };
+	Vec4 vec;
 	for (size_t i = 0; i < verts.size(); i++)
 	{
-		vec = verts[i];
+		vec = Utilities::ConvertToVec4Point(verts[i]);
 
 		vec = XMVector3Transform(vec, worldMatrix);
-
+		
 		//Get the smallest vertex 
-		minVert.x = std::min(minVert.x, XMVectorGetX(vec));
-		minVert.y = std::min(minVert.y, XMVectorGetY(vec));
-		minVert.z = std::min(minVert.z, XMVectorGetZ(vec));
+		m_Min.x = std::min(m_Min.x, XMVectorGetX(vec));
+		m_Min.y = std::min(m_Min.y, XMVectorGetY(vec));
+		m_Min.z = std::min(m_Min.z, XMVectorGetZ(vec));
 
 		//Get the largest vertex 
-		maxVert.x = std::max(maxVert.x, XMVectorGetX(vec));
-		maxVert.y = std::max(maxVert.y, XMVectorGetY(vec));
-		maxVert.z = std::max(maxVert.z, XMVectorGetZ(vec));
+		m_Max.x = std::max(m_Max.x, XMVectorGetX(vec));
+		m_Max.y = std::max(m_Max.y, XMVectorGetY(vec));
+		m_Max.z = std::max(m_Max.z, XMVectorGetZ(vec));
 	}
 
-	mBBMin = { minVert.x, minVert.y, minVert.z };
-	mBBMax = { maxVert.x, maxVert.y, maxVert.z };
-
-	mBBMin = XMVectorAdd(pos, mBBMin);
-	mBBMax = XMVectorAdd(pos, mBBMax);
+	//mBBMin = { minVert.x, minVert.y, minVert.z };
+	//mBBMax = { maxVert.x, maxVert.y, maxVert.z };
 }
 
-bool Bounds::IsInside(const Vector& objBBMinVertex,
-	const Vector& objBBMaxVertex)
+bool Bounds::IsInside(const Float3& objBBMinVertex,
+	const Float3& objBBMaxVertex)
 {
 	//Is obj1's max X greater than obj2's min X? If not, obj1 is to the LEFT of obj2
-	if (XMVectorGetX(mBBMax) > XMVectorGetX(objBBMinVertex))
-
-		//Is obj1's min X less than obj2's max X? If not, obj1 is to the RIGHT of obj2
-		if (XMVectorGetX(mBBMin) < XMVectorGetX(objBBMaxVertex))
-
-			//Is obj1's max Y greater than obj2's min Y? If not, obj1 is UNDER obj2
-			if (XMVectorGetY(mBBMax) > XMVectorGetY(objBBMinVertex))
-
-				//Is obj1's min Y less than obj2's max Y? If not, obj1 is ABOVE obj2
-				if (XMVectorGetY(mBBMin) < XMVectorGetY(objBBMaxVertex))
-
-					//Is obj1's max Z greater than obj2's min Z? If not, obj1 is IN FRONT OF obj2
-					if (XMVectorGetZ(mBBMax) > XMVectorGetZ(objBBMinVertex))
-
-						//Is obj1's min Z less than obj2's max Z? If not, obj1 is BEHIND obj2
-						if (XMVectorGetZ(mBBMin) < XMVectorGetZ(objBBMaxVertex))
-
-							//If we've made it this far, then the two bounding boxes are colliding
-							return true;
+	if ((m_Max.x > objBBMinVertex.x && m_Min.x < objBBMaxVertex.x) &&
+		(m_Max.y > objBBMinVertex.y && m_Min.y < objBBMaxVertex.y) && 
+		(m_Max.z > objBBMinVertex.z && m_Min.z < objBBMaxVertex.z))
+		return true;
 
 	//If the two bounding boxes are not colliding, then return false
 	return false;
+}
+
+bool Bounds::IsInside(const Bounds& other)
+{
+	//Is obj1's max X greater than obj2's min X? If not, obj1 is to the LEFT of obj2
+	if ((m_Max.x >= other.m_Min.x && m_Min.x <= other.m_Max.x))
+		if ((m_Max.y >= other.m_Min.y && m_Min.y <= other.m_Max.y))
+			if ((m_Max.z >= other.m_Min.z && m_Min.z <= other.m_Max.z))
+			return true;
+
+	//If the two bounding boxes are not colliding, then return false
+	return false;
+}
+
+
+bool Bounds::RayBoxIntersect(Ray& r)
+{
+	float txmin = (m_Min.x - r.Origin().x) * r.InvDirection().x;
+	float txmax = (m_Max.x - r.Origin().x) * r.InvDirection().x;
+
+	float tymin = (m_Min.y - r.Origin().y) * r.InvDirection().y;
+	float tymax = (m_Max.y - r.Origin().y) * r.InvDirection().y;
+
+	float tzmin = (m_Min.z - r.Origin().z) * r.InvDirection().z;
+	float tzmax = (m_Max.z - r.Origin().z) * r.InvDirection().z;
+
+	float tmin = std::max(std::max(std::min(txmin, txmax), std::min(tymin, tymax)), std::min(tzmin, tzmax));
+	float tmax = std::min(std::min(std::max(txmin, txmax), std::max(tymin, tymax)), std::max(tzmin, tzmax));
+
+	if (tmax < 0)
+	{
+		r.T(tmax);
+		return false;
+	}
+
+	if (tmin > tmax)
+	{
+		r.T(tmax);
+		return false;
+	}
+
+	if (tmin < 0) {
+		r.T(tmax);
+	}
+	else {
+		r.T(tmin);
+	}
+	return true;
 }

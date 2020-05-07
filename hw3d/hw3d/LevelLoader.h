@@ -6,5 +6,7 @@ struct LevelLoader
 
 	static void LoadObjects(std::vector<GameObject*>& objects);
 
+
+
 };
 

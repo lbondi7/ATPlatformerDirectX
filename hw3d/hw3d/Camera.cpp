@@ -2,10 +2,15 @@
 #include "Locator.h"
 #include "D3D.h"
 
-using namespace DirectX;
+#include "imgui/imgui.h"
+
 
 Camera::Camera()
 {
+	//m_Transform.position = { 0.0f, 0.0f, 0.0f, 1.0f };
+	m_LookAtPos = { 0.0f, 0.0f, 1.0f, 1.0f };
+	m_Up = { 0.0f, 1.0f, 0.0f, 1.0f };
+	m_Offset = { 0.0f, 0.0f, -10.0f, 1.0f };
 }
 
 Camera::~Camera()
@@ -15,8 +20,6 @@ Camera::~Camera()
 void Camera::Init()
 {
 	mViewMatrix = &Locator::GetD3D()->GetViewMatrix();
-	offset = { 0.0f, 0.0f, -5.0f, 0 };
-	up = { 0.0f, 1.0f, 0.0f, 0.0f };
 }
 
 void Camera::Update()
@@ -57,12 +60,19 @@ void Camera::Update()
 	////const auto pos = VectorTransform(transform.GetPos(),
 	////	XMMatrixRotationRollPitchYaw(phi, -theta, 0.0f));
 
-	rotationMatrix.r->m128_f32[2] *= -1.0f;
-	const auto pos = VectorTransform(offset, rotationMatrix);
-	auto hey = VectorAdd(lookAtPos, pos);
-	*mViewMatrix = XMMatrixLookAtLH(hey, lookAtPos,
-		up);// *XMMatrixRotationRollPitchYawFromVector(transform.GetRotRad());
 
+	//const auto pos = VectorTransform(m_Transform.GetPos(), m_RotationMatrix);
+	//const auto pos2 = VectorTransform(m_LookAtPos, m_RotationMatrix);
+	//const auto pos3 = VectorTransform(m_Up, m_RotationMatrix);
+	//auto hey = VectorAdd(pos2, pos);
+
+	//m_RotationMatrix = XMMatrixRotationRollPitchYawFromVector(m_Transform.GetRotRad());
+
+
+	m_Transform.SetPos(DirectX::XMVectorAdd(m_LookAtPos,  m_Offset));
+	//const auto pos = VectorTransform(m_Transform.GetPos(), XMMatrixRotationRollPitchYawFromVector(m_Transform.GetRotRad()));
+
+	*mViewMatrix = DirectX::XMMatrixLookAtLH(m_Transform.GetPos(), m_LookAtPos, m_Up);
 }
 
 void Camera::Render()
@@ -79,12 +89,12 @@ void Camera::Render()
 	//position = GetPos();
 
 	//// Setup where the camera is looking by default.
-	//lookAt = { 0.0f, 0.0f, 1.0f, 1.0f };
+	// lookAt = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 	//// Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
-	//pitch = GetRotX() * 0.0174532925f;
-	//yaw = GetRotY() * 0.0174532925f;
-	//roll = GetRotZ() * 0.0174532925f;
+	// pitch = GetRotX() * 0.0174532925f;
+	// yaw = GetRotY() * 0.0174532925f;
+	// roll = GetRotZ() * 0.0174532925f;
 
 	//// Create the rotation matrix from the yaw, pitch, and roll values.
 	//rotationMatrix = dx::XMMatrixRotationRollPitchYaw(yaw, pitch, roll);
@@ -103,24 +113,32 @@ void Camera::Render()
 	//mViewMatrix = dx::XMMatrixLookAtLH(position, lookAt, up);
 	// Finally create the view matrix from the three updated vectors.
 	//D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
+
+	if (ImGui::Begin("Camera Offset"))
+	{
+		ImGui::SliderFloat("Cam X Off", &m_Offset.m128_f32[0], -5.0f, 5.0f);
+		ImGui::SliderFloat("Cam Y Off", &m_Offset.m128_f32[1], 0.0f, 10.0f);
+		ImGui::SliderFloat("Cam Z Off", &m_Offset.m128_f32[2], -20.0f, 0.0f);
+	}
+	ImGui::End();
 }
 
-void Camera::SetLookAt(const Vector& _lookAt)
+void Camera::SetLookAt(const Vec4& _lookAt)
 {
-	lookAtPos = _lookAt;
+	m_LookAtPos = _lookAt;
 }
 
 void Camera::SetRotMatrix(const Matrix& rotMat)
 {
-	rotationMatrix = rotMat;
+	m_RotationMatrix = rotMat;
 }
 
 Transform& Camera::GetTransform()
 {
-	return transform;
+	return m_Transform;
 }
 
-void Camera::SetOffset(const Vector& _offset)
+void Camera::SetOffset(const Vec4& _offset)
 {
 
 }

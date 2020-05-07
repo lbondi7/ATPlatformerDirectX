@@ -2,6 +2,7 @@
 
 #include "Transform.h"
 #include "Constants.h"
+#include "PhysicsData.h"
 #include "Maths.h"
 
 #include <map>
@@ -15,23 +16,18 @@ public:
 	~Player();
 
 	void Init();
-	void Update(Transform& goTranform);
+	void Update(PhysicsData& physData, Transform& goTranform);
 
-	PlayerMotionState GetState();
-
-	void SetState(PlayerMotionState _state);
-
-	const Vector& GetVelocity();
+	const Vec4& GetVelocity();
 
 private:
 
-	PlayerMotionState state = PlayerMotionState::FALLING;
-	Vector mVelocity;
+	Vec4 mVelocity;
 	float mass = 25;
 	float acceleration = 0.0f;
 	float drag = 200.0f;
 	float mSpeed = 7500.0f;
 	float mRotSpeed = 100000.0f;
-	std::map<PlayerMotionState, std::string> stateMap;
+	std::map<ObjectMotionState, std::string> stateMap;
 };
 

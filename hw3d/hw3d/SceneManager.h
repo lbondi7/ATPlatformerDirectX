@@ -18,6 +18,7 @@ private:
 	enum class CurrentScene : int {
 		MENU = 0,
 		GAME = 1,
+		LEVEL_EDITOR = 2,
 	};
 
 	CurrentScene currentScene = CurrentScene::MENU;

@@ -2,10 +2,10 @@
 #include "Scene.h"
 #include "GameObject.h"
 #include "Camera.h"
+#include "BoundingGrid.h"
 
 #include <memory>
 #include <vector>
-
 
 class GameScene :
 	public Scene
@@ -29,9 +29,13 @@ private:
 	int mObjNum = 0;
 
 	std::unique_ptr<Camera> mCam;
-	std::vector<GameObject*> pGObjects;
+	std::vector<GameObject*> p_GObjects;
 	std::unique_ptr<GameObject> pPlayer;
 	Matrix mWorldMatrix = DirectX::XMMatrixIdentity();
 
 	bool isColliding = false;
+
+	LightBufferData light;
+	std::unique_ptr<BoundingGrid> grid;
+	std::vector<GameObject*> m_CollideableObjects;
 };

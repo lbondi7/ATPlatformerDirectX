@@ -36,5 +36,5 @@ private:
 	std::string mShader = "basic";
 
 	DirectX::XMMATRIX mModelMatrix;
-	Transform mTransform;
+	Transform m_Transform;
 };

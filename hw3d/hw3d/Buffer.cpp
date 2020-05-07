@@ -5,6 +5,7 @@
 
 HRESULT Buffer::CreateBuffer(D3D11_BIND_FLAG flag, D3D11_USAGE usage, UINT accessFlags, const void* _data, UINT _size, UINT _stride)
 {
+	HRESULT hr;
 	D3D11_BUFFER_DESC descInfo;
 	descInfo.BindFlags = flag;
 	descInfo.Usage = usage;
@@ -25,12 +26,14 @@ HRESULT Buffer::CreateBuffer(D3D11_BIND_FLAG flag, D3D11_USAGE usage, UINT acces
 		m_Stride = _stride;
 		m_Offset = 0u;
 
-		return Locator::GetD3D()->GetDevice()->CreateBuffer(&descInfo, &subSourceData, m_Buffer.GetAddressOf());
+		hr = Locator::GetD3D()->GetDevice()->CreateBuffer(&descInfo, &subSourceData, m_Buffer.GetAddressOf());
+		return hr;
 		break;
 	}
 	case D3D11_BIND_CONSTANT_BUFFER:
 	{
-		return Locator::GetD3D()->GetDevice()->CreateBuffer(&descInfo, 0, m_Buffer.GetAddressOf());
+		hr = Locator::GetD3D()->GetDevice()->CreateBuffer(&descInfo, 0, m_Buffer.GetAddressOf());
+		return hr;
 		break;
 	}
 	}

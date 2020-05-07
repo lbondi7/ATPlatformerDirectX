@@ -4,6 +4,8 @@
 #include "Bounds.h"
 #include "RenderData.h"
 #include "Constants.h"
+#include "Physics.h"
+#include "InstanceData.h"
 
 #include <vector>
 
@@ -15,14 +17,21 @@ public:
 	~GameObject();
 
 	void Init();
-	void Init(std::string mod);
+	void Init(ModelType model, TextureType texture, ShaderType shader);
+	void InitRenderData();
+
+	void InitInstance(int instanceCount, std::vector<Vec4>& positions);
+
 	void AddModel();
 	Model* GetModel();
 
 	void AddPlayer();
 	Player* GetPlayer();
 
-	void Update(const Matrix& worldMatrix);
+	void AddPhysics();
+	Physics* GetPhysics();
+
+	void Update();
 	void Render();
 
 	Transform& GetTransform();
@@ -33,22 +42,38 @@ public:
 
 	Bounds& GetBB();
 
-	Matrix GetMatrix();
+	Matrix& GetMatrix();
+
+	RenderData& GetRenderData() { return m_RenderData; }
+
+	PhysicsData& GetPhysicsData() { return m_PhysicsData; }
+
+	std::vector<int>& BoundIDs() { return m_BoundsID; }
 
 private:
 
-	Model* pModel = nullptr;
-	Player* pPlayer = nullptr;
-	Transform mTransform;
+	Model* p_Model = nullptr;
+	Player* p_Player = nullptr;
+	Physics* p_Physics = nullptr;
+	Transform m_Transform;
+
+	ModelType m_Model;
+	TextureType m_Texture;
+	ShaderType m_Shader;
+
+	PhysicsData m_PhysicsData;
 
 	GameObjectTag tag = GameObjectTag::STATIC;
 
-	Matrix mObjMatrix;
-	std::vector<Vector> mVerts;
+	Matrix m_ObjMatrix = DirectX::XMMatrixIdentity();
+	std::vector<Float3> m_Verts;
 
-	MatrixBufferType matrices;
+	MatrixBufferData matrices;
+	RenderData m_RenderData;
+	Bounds m_BB;
 
-	RenderData renderData;
-	Bounds mBB;
+	std::vector<int> m_BoundsID;
+	//int m_BoundsID = 0;
+
 };
 

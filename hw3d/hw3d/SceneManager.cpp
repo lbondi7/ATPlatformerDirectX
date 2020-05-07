@@ -1,6 +1,7 @@
 #include "SceneManager.h"
 #include "MenuScene.h"
 #include "GameScene.h"
+#include "LevelEditorScene.h"
 #include "Locator.h"
 
 bool SceneManager::Init()
@@ -29,8 +30,14 @@ void SceneManager::Update()
 		activeScene->Update();
 		currentScene = SceneManager::CurrentScene::GAME;
 		break;
+	case Scene::CurrentScene::LEVEL_EDITOR:
+		activeScene.reset();
+		activeScene = std::make_unique<LevelEditorScene>();
+		activeScene->Init();
+		activeScene->Update();
+		currentScene = SceneManager::CurrentScene::LEVEL_EDITOR;
+		break;
 	}
-
 }
 
 void SceneManager::Render()

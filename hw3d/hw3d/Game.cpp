@@ -7,9 +7,8 @@
 #include "D3D.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "Light.h"
-#include "Matrices.h"
 #include "Misc.h"
+#include "ResourceData.h"
 
 #include <iomanip>
 #include <thread>
@@ -27,18 +26,15 @@ bool Game::Init()
 	Locator::InitKey(new Keyboard());
 	Locator::InitMouse(new Mouse());
 	Locator::InitTimer(new Timer());
-	Locator::InitVertices(new Vertices());
 	Locator::InitTexture(new Texture());
-	Locator::InitShader(new Shader());
-	Locator::InitLight(new Light());
-	Locator::InitMatrices(new Matrices());
 	Locator::InitMisc(new Misc());
+	Locator::InitResources(new Resources());
 
 	Locator::InitExitBool();
 	Locator::GetKey()->Initialise();
 	Locator::GetMouse()->Initialise();
 
-	window = new Window(500, 500, "hello");
+	window = new Window(WINDOW_WIDTH, WINDOW_HEIGHT, "Direct X: Platformer (Lewis : 17019105)");
 	sceneManager = std::make_unique<SceneManager>();
 	sceneManager->Init();
 
@@ -47,7 +43,7 @@ bool Game::Init()
 
 void Game::Run()
 {
-	while (*Locator::GetExitBool() != true)
+	while (!*Locator::GetExitBool())
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		Locator::GetTimer()->SetDeltaTime();

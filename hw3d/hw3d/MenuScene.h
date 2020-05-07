@@ -16,7 +16,8 @@ private:
 	enum class ChangeScene : int
 	{
 		NONE = 0,
-		GAME = 1
+		GAME = 1,
+		LEVEL_EDITOR = 2,
 	};
 
 	ChangeScene changeScene = ChangeScene::NONE;

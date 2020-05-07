@@ -1,28 +1,21 @@
 #pragma once
+
+#include "Constants.h"
+
 #include <d3d11.h>
 #include <string>
 #include <map>
 #include <vector>
+#include <wrl.h>
 
-class Shader
+struct Shaders
 {
-public:
-	Shader() = default;
-	~Shader() = default;
+	HRESULT Create(const std::string& shader);
 
-	HRESULT CreateShader(const std::string& shader);
+	HRESULT Create(const std::string& shader, bool instancing);
 
-	ID3D11PixelShader*& GetPixelShader(const std::string& shader);
-	ID3D11VertexShader*& GetVertexShader(const std::string& shader);
-	ID3D11InputLayout*& GetInputLayout(const std::string& shader);
-
-private:
-
-	std::vector<ID3D11PixelShader*> pPixelShaders;
-	std::vector<ID3D11VertexShader*> pVertexShaders;
-	std::vector<ID3D11InputLayout*> pInputLayouts;
-
-	std::map<std::string, int> shaderMap;
-	int shaderCount = 0;
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_VertexShader;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_PixelShader;
+	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_InputLayout;
 };
 

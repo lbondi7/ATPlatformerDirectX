@@ -7,7 +7,8 @@ public:
 	{
 		NONE = 0,
 		MENU = 1,
-		GAME = 2
+		GAME = 2,
+		LEVEL_EDITOR = 3,
 	};
 
 	Scene() = default;

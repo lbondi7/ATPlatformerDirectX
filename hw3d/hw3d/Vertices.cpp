@@ -22,6 +22,107 @@ Vertices::Vertices()
 	//shapes["cube"] = 0;
 }
 
+bool Vertices::LoadVertices(const std::string& shapeName)
+{
+	struct Faces
+	{
+		int vIndex;
+		int tIndex;
+		int nIndex;
+	};
+
+	std::vector<Vec4> verticess;
+	size_t maxi = verticess.max_size();
+	size_t maxu = verticess.capacity();
+	std::vector<DirectX::XMFLOAT2> textureCoords;
+	std::vector<Vec4> normals;
+	std::vector<std::vector<Faces>> faces;
+	std::vector<Faces> face;
+	int vertPerFace = 3;
+	face.reserve(vertPerFace);
+	bool skip = false;
+	std::fstream file;
+	file.open("Data//models//" + shapeName + ".obj");
+	bool isUV = false;
+	bool isNorm = false;
+	if (file.is_open())
+	{
+		//std::stringstream ss;
+		char lineChar;
+		//ss << file.rdbuf();
+		float x, y, z;
+		while (!file.eof())
+		{
+			file.get(lineChar);
+
+			skip = false;
+			if (lineChar == 'v')
+			{
+				file.get(lineChar);
+				switch (lineChar)
+				{
+				case ' ':
+				{
+					file >> x >> y >> z;
+					verticess.push_back({ x, y, z });
+					break;
+				}
+				case 't':
+				{
+					isUV = true;
+					file.get(lineChar);
+					if (lineChar != ' ')
+						break;
+
+					file >> x >> y;
+					textureCoords.push_back({ 1 - x, 1 - y });
+					break;
+				}
+				case 'n':
+				{
+					isNorm = true;
+					file.get(lineChar);
+					if (lineChar != ' ')
+						break;
+
+					file >> x >> y >> z;
+					normals.push_back({ x, y, z });
+					break;
+				}
+				}
+			}
+			else if (lineChar == 'f')
+			{
+				file.get(lineChar);
+				if (lineChar == ' ')
+				{
+					for (size_t i = 0; i < vertPerFace; i++)
+					{
+						file >> x;
+						file.get(lineChar);
+						if (isUV)
+							file >> y;
+						else
+							y = -1;
+						file.get(lineChar);
+						if (isNorm)
+							file >> z;
+						else
+							z = -1;
+						face.push_back({ (int)x, (int)y, (int)z });
+					}
+					faces.push_back(face);
+					face.clear();
+					face.reserve(vertPerFace);
+				}
+			}
+		}
+		file.close();
+	}
+
+	return true;
+}
+
 HRESULT Vertices::CreateBuffer(const std::string& shapeName)
 {
 	HRESULT hr = S_OK;
@@ -247,11 +348,11 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<VertexType>& ver
 		int nIndex;
 	};
 
-	std::vector<Vector> verticess;
+	std::vector<Vec4> verticess;
 	size_t maxi = verticess.max_size();
 	size_t maxu = verticess.capacity();
 	std::vector<DirectX::XMFLOAT2> textureCoords;
-	std::vector<Vector> normals;
+	std::vector<Vec4> normals;
 	std::vector<std::vector<Faces>> faces;
 	std::vector<Faces> face;
 	int vertPerFace = 3;
@@ -350,7 +451,7 @@ void Vertices::loadOBJ(const std::string& modelTag, std::vector<VertexType>& ver
 	float vtIn;
 	float vnIn;
 	DirectX::XMFLOAT2 t;
-	Vector n;
+	Vec4 n;
 
 	for (size_t i = 0; i < faces.size(); i++)
 	{

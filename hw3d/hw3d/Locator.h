@@ -1,17 +1,32 @@
 #pragma once
 
+#include <d3d11.h>
+#include "dxerr.h"
+
+#ifdef _DEBUG
+#ifndef HR
+#define HR(x) \
+{    \
+    HRESULT hr = x; \
+    if (FAILED(hr)) \
+    { \
+        DXTraceW(__FILEW__, __LINE__, hr, L#x, TRUE); \
+    }  \
+}
+#endif
+#ifndef HR
+#define HR(x) x;
+#endif
+#endif
+
 class Keyboard;
 class Mouse;
 class Timer;
-class Vertices;
 class D3D;
 class Graphics;
-class Texture;
-class Shader;
-class Light;
-class Matrices;
+struct Texture;
 struct Misc;
-struct ResourceData;
+struct Resources;
 
 class Locator
 {
@@ -49,14 +64,6 @@ public:
 		*exit = false;
 	}
 
-	static Vertices* GetVertices() {
-		return vertices;
-	}
-
-	static void InitVertices(Vertices* _buffer) {
-		vertices = _buffer;
-	}
-
 	static D3D* GetD3D() {
 		return d3d;
 	}
@@ -71,30 +78,6 @@ public:
 
 	static void InitTexture(Texture* _texture) {
 		texture = _texture;
-	}
-
-	static Shader* GetShader() {
-		return shader;
-	}
-
-	static void InitShader(Shader* _shader) {
-		shader = _shader;
-	}
-
-	static Light* GetLight() {
-		return light;
-	}
-
-	static void InitLight(Light* _light) {
-		light = _light;
-	}
-
-	static void InitMatrices(Matrices* _matrices) {
-		matrices = _matrices;
-	}
-
-	static Matrices* GetMatrices() {
-		return matrices;
 	}
 
 	static void InitMisc(Misc* _misc) {
@@ -113,12 +96,12 @@ public:
 		graphic = _graphic;
 	}
 
-	static ResourceData* GetResourceData() {
-		return data;
+	static Resources* GetResources() {
+		return resources;
 	}
 
-	static void InitResourceData(ResourceData* _data) {
-		data = _data;
+	static void InitResources(Resources* _data) {
+		resources = _data;
 	}
 
 private:
@@ -126,15 +109,11 @@ private:
 	static Keyboard* key;
 	static Mouse* mouse;
 	static Timer* timer;
-	static Vertices* vertices;
 	static D3D* d3d;
 	static Graphics* graphic;
 	static Texture* texture;
-	static Shader* shader;
-	static Light* light;
-	static Matrices* matrices;
 	static Misc* misc;
-	static ResourceData* data;
+	static Resources* resources;
 
 	// Static Variables
 	static bool* exit;

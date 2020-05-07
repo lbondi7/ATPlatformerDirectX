@@ -1,0 +1,8 @@
+{
+    "Model Count" : 5,
+    "Models" : ["Cube", "Triangle", "Square", "Iso", "Batman"],
+    "Texture Count" : 1,
+    "Textures": ["Simon", "UV", "MrBean"],
+    "Shader Count" : 4,
+    "Shaders" : ["Default", "Light", "Texture", "LightInstance"]
+}

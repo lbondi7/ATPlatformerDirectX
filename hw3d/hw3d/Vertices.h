@@ -17,6 +17,8 @@ public:
 	Vertices();
 	~Vertices() = default;
 
+	bool LoadVertices(const std::string& shapeName);
+
 	HRESULT CreateBuffer(const std::string& shapeName);
 
 	int GetBufferNum(const std::string& shapeName);
@@ -49,7 +51,7 @@ private:
 	std::vector<uint32_t> m_Strides;
 	std::vector<uint32_t> m_Offsets;
 	std::vector<int> m_VertexCounts;
-	std::vector<std::vector<Vector>> m_Vertices;
+	std::vector<std::vector<Vec4>> m_Vertices;
 	std::vector<std::future<HRESULT>> m_Futures;
 
 	int bufferCount = 0;

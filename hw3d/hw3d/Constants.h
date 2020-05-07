@@ -1,6 +1,8 @@
 #pragma once
+#include "Utilities.h"
 
-#include "Maths.h"
+const unsigned int WINDOW_WIDTH = 1200;
+const unsigned int WINDOW_HEIGHT = 800;
 
 const float GRAVITY = 9.80665f;
 const float RADIAN = 57.29577951f;
@@ -12,26 +14,27 @@ enum class GameObjectTag : int
 	PLAYER = 2,
 	GROUND = 3,
 	KILLBOX = 4,
+	PROP = 5
 };
 
-enum class PlayerMotionState : int
+enum class ObjectMotionState : int
 {
 	GROUNDED = 0,
 	FALLING = 1,
 };
 
-struct MatrixBufferType
+struct MatrixBufferData
 {
-	DirectX::XMMATRIX world;
-	DirectX::XMMATRIX view;
-	DirectX::XMMATRIX projection;
+	alignas(16) DirectX::XMMATRIX world;
+	alignas(16) DirectX::XMMATRIX view;
+	alignas(16) DirectX::XMMATRIX projection;
 };
 
 struct VertexType
 {
 	struct
 	{
-		Vector position;
+		Vec4 position;
 	}pos;
 
 	struct
@@ -42,26 +45,20 @@ struct VertexType
 
 	struct
 	{
-		Vector normal;
+		Vec4 normal;
 	}norm;
-
-	//struct
-	//{
-	//	DirectX::XMVECTOR color;
-	//}color;
 };
 
-struct ImageData
+struct Vertex
 {
-	struct ImageBufferData
-	{
-		unsigned char data1[12];
-		unsigned short width;
-		unsigned short height;
-		unsigned char bpp;
-		unsigned char data2;
+	alignas(16) Float3 position;
+	alignas(16) Float2 texCoord;
+	alignas(16) Float3 normal;
 
-	}buffer;
-
-	unsigned char* data = nullptr;
+	bool operator==(const Vertex other) const {
+		bool posCheck = (position.x == other.position.x && position.y == other.position.y && position.z == other.position.z);
+		bool texCheck = (texCoord.x == other.texCoord.x && texCoord.y == other.texCoord.y);
+		bool normCheck = (normal.x == other.normal.x && normal.y == other.normal.y && normal.z == other.normal.z);
+		return posCheck && texCheck && normCheck;
+	}
 };

@@ -4,35 +4,19 @@
 #include "Locator.h"
 #include "Texture.h"
 #include "Shader.h"
-#include "Light.h"
-#include "Matrices.h"
 #include "Misc.h"
 #include "ResourceData.h"
 
 #include "imgui//imgui.h"
 #include "imgui//imgui_impl_win32.h"
 #include "imgui//imgui_impl_dx11.h"
+#include "imgui/ImGuizmo.h"
 
 #include <sstream>
 
 namespace wrl = Microsoft::WRL;
 namespace dx = DirectX;
 
-// graphics exception checking/throwing macros (some with dxgi infos)
-#define GRAPHICS_EXCEPT_NOINFO(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
-#define GRAPHICS_THROW_NOINFO(hrcall) if( FAILED( hr = (hrcall) ) ) throw Graphics::HrException( __LINE__,__FILE__,hr )
-
-#ifndef NDEBUG
-#define GRAPHICS_EXCEPT(hr) Graphics::HrException( __LINE__,__FILE__,(hr),infoManager.GetMessages() )
-#define GRAPHICS_THROW_INFO(hrcall) infoManager.Set(); if( FAILED( hr = (hrcall) ) ) throw GRAPHICS_EXCEPT(hr)
-#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hr),infoManager.GetMessages() )
-#define GRAPHICS_THROW_INFO_ONLY(call) infoManager.Set(); (call); {auto v = infoManager.GetMessages(); if(!v.empty()) {throw Graphics::InfoException( __LINE__,__FILE__,v);}}
-#else
-#define GRAPHICS_EXCEPT(hr) Graphics::HrException( __LINE__,__FILE__,(hr) )
-#define GRAPHICS_THROW_INFO(hrcall) GRAPHICS_THROW_NOINFO(hrcall)
-#define GRAPHICS_DEVICE_REMOVED_EXCEPT(hr) Graphics::DeviceRemovedException( __LINE__,__FILE__,(hr) )
-#define GRAPHICS_THROW_INFO_ONLY(call) (call)
-#endif
 
 Graphics::Graphics( HWND hWnd )
 {
@@ -40,27 +24,27 @@ Graphics::Graphics( HWND hWnd )
 	HRESULT hr;
 
 	d3d = std::make_unique<D3D>();
-	GRAPHICS_THROW_INFO( d3d->Init(hWnd));
+	d3d->Init(hWnd);
 	Locator::InitD3D(d3d.get());
 
 	// gain access to texture subresource in swap chain (back buffer)
 	wrl::ComPtr<ID3D11Resource> pBackBuffer;
-	GRAPHICS_THROW_INFO( d3d->GetSwapChain()->GetBuffer( 0,__uuidof(ID3D11Resource),&pBackBuffer ) );
-	GRAPHICS_THROW_INFO( d3d->GetDevice()->CreateRenderTargetView( pBackBuffer.Get(),nullptr,&pTargetView ) );
+	d3d->GetSwapChain()->GetBuffer( 0,__uuidof(ID3D11Resource),&pBackBuffer);
+	d3d->GetDevice()->CreateRenderTargetView( pBackBuffer.Get(),nullptr,&pTargetView);
 
 	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 	dsDesc.DepthEnable = TRUE;
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	wrl::ComPtr<ID3D11DepthStencilState> pDDState;
-	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilState(&dsDesc, &pDDState));
+	d3d->GetDevice()->CreateDepthStencilState(&dsDesc, &pDDState);
 
 	d3d->GetDeviceContext()->OMSetDepthStencilState(pDDState.Get(), 1u);
 
 	wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
-	descDepth.Width = 500u;
-	descDepth.Height = 500u;
+	descDepth.Width = WINDOW_WIDTH;
+	descDepth.Height = WINDOW_HEIGHT;
 	descDepth.MipLevels = 1u;
 	descDepth.ArraySize = 1u;
 	descDepth.Format = DXGI_FORMAT_D32_FLOAT;
@@ -69,14 +53,14 @@ Graphics::Graphics( HWND hWnd )
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
+	d3d->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
 
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDepStenView = {};
 	descDepStenView.Format = DXGI_FORMAT_D32_FLOAT;
 	descDepStenView.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	descDepStenView.Texture2D.MipSlice = 0u;
-	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView));
+	d3d->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDepStenView, &pDepStenView);
 
 	D3D11_RASTERIZER_DESC rasterDesc = {};
 	rasterDesc.AntialiasedLineEnable = true;
@@ -91,7 +75,7 @@ Graphics::Graphics( HWND hWnd )
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
 	// Create the rasterizer state from the description we just filled out.
-	GRAPHICS_THROW_INFO(d3d->GetDevice()->CreateRasterizerState(&rasterDesc, &m_rasterState));
+	d3d->GetDevice()->CreateRasterizerState(&rasterDesc, &m_rasterState);
 
 	// Now set the rasterizer state.
 	d3d->GetDeviceContext()->RSSetState(m_rasterState);
@@ -102,111 +86,83 @@ Graphics::Graphics( HWND hWnd )
 
 	// configure viewport
 	D3D11_VIEWPORT viewport;
-	viewport.Width = 500;
-	viewport.Height = 500;
+	viewport.Width = WINDOW_WIDTH;
+	viewport.Height = WINDOW_HEIGHT;
 	viewport.MinDepth = 0;
 	viewport.MaxDepth = 1;
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	d3d->GetDeviceContext()->RSSetViewports(1u, &viewport);
 
-
-	Locator::InitResourceData(new ResourceData());
-	Locator::GetVertices()->CreateBuffer("cube");
-	//Locator::GetVertices()->CreateBuffer("iso");
-	//Locator::GetVertices()->CreateBuffer("Teapot");
-	//Locator::GetVertices()->CreateBuffer("lambo");
-	//Locator::GetVertices()->CreateBuffer("helli");
-	//Locator::GetTexture()->CreateTextures("Simon");
-	Locator::GetResourceData()->LoadImageData("Simon");
-	//Locator::GetTexture()->CreateTextures("UV");
-	//Locator::GetTexture()->CreateTextures("MrBean");
-	Locator::GetShader()->CreateShader("basic");
-	Locator::GetLight()->CreateBuffer();
-	Locator::GetMatrices()->CreateBuffer();
+	Locator::GetResources()->LoadResources();
 	Locator::GetMisc()->SetClearColour({ 1, 0, 0, 1 });
 }
 
-void Graphics::Render(dx::XMMATRIX wMtrx,const std::string& model, const std::string& texture, const std::string& shader)
+void Graphics::Render(const RenderData* renderData)
 {
-	mProjMatrixCopy = dx::XMMatrixTranspose(d3d->GetProjMatrix());
-	mViewMatrixCopy = d3d->GetViewMatrix();
-	mViewMatrixCopy = dx::XMMatrixTranspose(mViewMatrixCopy);
+	/*******	REQUIRED	********************/
 
-	CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, mViewMatrixCopy, mProjMatrixCopy));
+	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, renderData->up_MatrixBuffer->m_Buffer.GetAddressOf());
 
-	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, &Locator::GetMatrices()->GetBuffer());
+	if (renderData->m_DrawInstanced)
+	{
+		ID3D11Buffer* vBuffers[]{renderData->p_VertexBuffer->m_Buffer.Get(), renderData->up_InstanceBuffer->m_Buffer.Get()};
+		unsigned int strides[]{ renderData->p_VertexBuffer->m_Stride, renderData->up_InstanceBuffer->m_Stride };
+		unsigned int offsets[]{ renderData->p_VertexBuffer->m_Offset, renderData->up_InstanceBuffer->m_Offset };
 
-	CheckHResults(Locator::GetLight()->MapResource());
+		UINT size = static_cast<UINT>(std::size(vBuffers));
+		Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, size, vBuffers,
+			strides, offsets);
+	}
+	else
+	{
+		Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u, renderData->p_VertexBuffer->m_Buffer.GetAddressOf(),
+			&renderData->p_VertexBuffer->m_Stride, &renderData->p_VertexBuffer->m_Offset);
+	}
 
-	Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(0, 1, &Locator::GetLight()->GetBuffer());
+	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(renderData->p_IndexBuffer->m_Buffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 
-	Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u, 
-		&Locator::GetVertices()->GetVertexBuffer(model), 
-		&Locator::GetVertices()->GetStride(model), 
-		&Locator::GetVertices()->GetOffset(model));
+	if (renderData->up_LightBuffer)
+	{
+		Locator::GetD3D()->GetDeviceContext()->PSSetShader(renderData->p_Shader->m_PixelShader.Get(), nullptr, 0u);
+		Locator::GetD3D()->GetDeviceContext()->VSSetShader(renderData->p_Shader->m_VertexShader.Get(), nullptr, 0u);
+	}
+	else
+	{
+		Locator::GetD3D()->GetDeviceContext()->PSSetShader(Locator::GetResources()->up_ShaderMap[ShaderType::DEFAULT]->m_PixelShader.Get(), nullptr, 0u);
+		Locator::GetD3D()->GetDeviceContext()->VSSetShader(Locator::GetResources()->up_ShaderMap[ShaderType::DEFAULT]->m_VertexShader.Get(), nullptr, 0u);
+	}
 
-	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(Locator::GetVertices()->GetIndexBuffer(model), DXGI_FORMAT_R16_UINT, 0u);
+	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout(renderData->p_Shader->m_InputLayout.Get());
 
-	Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, &Locator::GetTexture()->GetTextureView(texture));
+	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(renderData->m_Topolgy);
 
-	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout(Locator::GetShader()->GetInputLayout(shader));
+	/*******************************************/
 
-	Locator::GetD3D()->GetDeviceContext()->PSSetShader(Locator::GetShader()->GetPixelShader(shader), nullptr, 0u);
+	/*******	OPTIONAL	********************/
 
-	Locator::GetD3D()->GetDeviceContext()->VSSetShader(Locator::GetShader()->GetVertexShader(shader), nullptr, 0u);
+	if(renderData->up_LightBuffer)
+		Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(0, 1, renderData->up_LightBuffer->m_Buffer.GetAddressOf());
 
-	Locator::GetD3D()->GetDeviceContext()->PSSetSamplers(0, 1, &Locator::GetTexture()->GetSampleState(texture));
+	if (renderData->p_Texture)
+	{
+		Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, renderData->p_Texture->m_TextureView.GetAddressOf());
+		Locator::GetD3D()->GetDeviceContext()->PSSetSamplers(0, 1, renderData->p_Texture->m_SampleState.GetAddressOf());
+	}
 
-	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	/*******************************************/
 
-	Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndicesSize(model), 0u, 0u);
-	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
-}
+	if (renderData->m_DrawInstanced)
+	{
+		if (renderData->m_DrawIndexed)
+			Locator::GetD3D()->GetDeviceContext()->DrawIndexedInstanced(renderData->m_IndexCount, renderData->up_InstanceData->instanceCount, 0u, 0u, 0u);
+	}
+	else
+	{
+		if (renderData->m_DrawIndexed)
+			Locator::GetD3D()->GetDeviceContext()->DrawIndexed(renderData->m_IndexCount, 0u, 0u);
+	}
 
-void Graphics::Render(const RenderData* renderData, const std::string& texture, const std::string& shader)
-{
-	//mProjMatrixCopy = dx::XMMatrixTranspose(d3d->GetProjMatrix());
-	//mViewMatrixCopy = d3d->GetViewMatrix();
-	//mViewMatrixCopy = dx::XMMatrixTranspose(mViewMatrixCopy);
-
-	//CheckHResults(Locator::GetMatrices()->MapResource(wMtrx, mViewMatrixCopy, mProjMatrixCopy));
-
-	Locator::GetD3D()->GetDeviceContext()->VSSetConstantBuffers(0u, 1u, renderData->ConstantBuffer.m_Buffer.GetAddressOf());
-
-	CheckHResults(Locator::GetLight()->MapResource());
-
-	Locator::GetD3D()->GetDeviceContext()->PSSetConstantBuffers(0, 1, &Locator::GetLight()->GetBuffer());
-
-	//Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u,
-	//	&Locator::GetVertices()->GetVertexBuffer(model),
-	//	&Locator::GetVertices()->GetStride(model),
-	//	&Locator::GetVertices()->GetOffset(model));
-
-	Locator::GetD3D()->GetDeviceContext()->IASetVertexBuffers(0u, 1u,
-		renderData->VertexBuffer.m_Buffer.GetAddressOf(),
-		&renderData->VertexBuffer.m_Stride,
-		&renderData->VertexBuffer.m_Offset);
-
-	//Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(Locator::GetVertices()->GetIndexBuffer(model), DXGI_FORMAT_R16_UINT, 0u);
-
-	Locator::GetD3D()->GetDeviceContext()->IASetIndexBuffer(renderData->IndexBuffer.m_Buffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
-
-	Locator::GetD3D()->GetDeviceContext()->PSSetShaderResources(0u, 1u, renderData->texture.m_TextureView.GetAddressOf());
-
-	Locator::GetD3D()->GetDeviceContext()->IASetInputLayout(Locator::GetShader()->GetInputLayout(shader));
-
-	Locator::GetD3D()->GetDeviceContext()->PSSetShader(Locator::GetShader()->GetPixelShader(shader), nullptr, 0u);
-
-	Locator::GetD3D()->GetDeviceContext()->VSSetShader(Locator::GetShader()->GetVertexShader(shader), nullptr, 0u);
-
-	Locator::GetD3D()->GetDeviceContext()->PSSetSamplers(0, 1, renderData->texture.m_SampleState.GetAddressOf());
-
-	Locator::GetD3D()->GetDeviceContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-	//Locator::GetD3D()->GetDeviceContext()->DrawIndexed((UINT)Locator::GetVertices()->GetIndicesSize(model), 0u, 0u);
-	Locator::GetD3D()->GetDeviceContext()->DrawIndexed(renderData->indexCount, 0u, 0u);
-	//Locator::GetD3D()->GetDeviceContext()->Draw((UINT)Locator::GetBuffers()->GetIndeciesSize(shapeType), 0u);
 }
 
 void Graphics::BeginFrame() noexcept
@@ -214,9 +170,10 @@ void Graphics::BeginFrame() noexcept
 	ImGui_ImplDX11_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 
 	const float colour[] = { Locator::GetMisc()->GetClearColour().x,
-		Locator::GetMisc()->GetClearColour().w,
+		Locator::GetMisc()->GetClearColour().y,
 		Locator::GetMisc()->GetClearColour().z,
 		Locator::GetMisc()->GetClearColour().w };
 	d3d->GetDeviceContext()->ClearRenderTargetView( pTargetView.Get(),colour );
@@ -228,138 +185,7 @@ void Graphics::EndFrame()
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
-	HRESULT hr;
-#ifndef NDEBUG
-	infoManager.Set();
-#endif
-	if( FAILED( hr = d3d->GetSwapChain()->Present( 1u,0u ) ) )
-	{
-		if( hr == DXGI_ERROR_DEVICE_REMOVED )
-		{
-			throw GRAPHICS_DEVICE_REMOVED_EXCEPT(d3d->GetDevice()->GetDeviceRemovedReason() );
-		}
-		else
-		{
-			throw GRAPHICS_EXCEPT( hr );
-		}
-	}
-}
 
-
-
-void Graphics::CheckHResults(HRESULT hr)
-{
-	GRAPHICS_THROW_INFO(hr);
-}
-
-D3D* Graphics::GetD3D()
-{
-	return d3d.get();
-}
-
-
-// Graphics exception stuff
-Graphics::HrException::HrException( int line,const char * file,HRESULT hr,std::vector<std::string> infoMsgs ) noexcept
-	:
-	Exception( line,file ),
-	hr( hr )
-{
-	// join all info messages with newlines into single string
-	for( const auto& m : infoMsgs )
-	{
-		info += m;
-		info.push_back( '\n' );
-	}
-	// remove final newline if exists
-	if( !info.empty() )
-	{
-		info.pop_back();
-	}
-}
-
-const char* Graphics::HrException::what() const noexcept
-{
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< "[Error Code] 0x" << std::hex << std::uppercase << GetErrorCode()
-		<< std::dec << " (" << (unsigned long)GetErrorCode() << ")" << std::endl
-		<< "[Error String] " << GetErrorString() << std::endl
-		<< "[Description] " << GetErrorDescription() << std::endl;
-	if( !info.empty() )
-	{
-		oss << "\n[Error Info]\n" << GetErrorInfo() << std::endl << std::endl;
-	}
-	oss << GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-const char* Graphics::HrException::GetType() const noexcept
-{
-	return "Lewis Graphics Exception";
-}
-
-HRESULT Graphics::HrException::GetErrorCode() const noexcept
-{
-	return hr;
-}
-
-std::string Graphics::HrException::GetErrorString() const noexcept
-{
-	return DXGetErrorString( hr );
-}
-
-std::string Graphics::HrException::GetErrorDescription() const noexcept
-{
-	char buf[512];
-	DXGetErrorDescription( hr,buf,sizeof( buf ) );
-	return buf;
-}
-
-std::string Graphics::HrException::GetErrorInfo() const noexcept
-{
-	return info;
-}
-
-
-const char* Graphics::DeviceRemovedException::GetType() const noexcept
-{
-	return "Lewis Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
-}
-Graphics::InfoException::InfoException( int line,const char * file,std::vector<std::string> infoMsgs ) noexcept
-	:
-	Exception( line,file )
-{
-	// join all info messages with newlines into single string
-	for( const auto& m : infoMsgs )
-	{
-		info += m;
-		info.push_back( '\n' );
-	}
-	// remove final newline if exists
-	if( !info.empty() )
-	{
-		info.pop_back();
-	}
-}
-
-
-const char* Graphics::InfoException::what() const noexcept
-{
-	std::ostringstream oss;
-	oss << GetType() << std::endl
-		<< "\n[Error Info]\n" << GetErrorInfo() << std::endl << std::endl;
-	oss << GetOriginString();
-	whatBuffer = oss.str();
-	return whatBuffer.c_str();
-}
-
-const char* Graphics::InfoException::GetType() const noexcept
-{
-	return "Lewis Graphics Info Exception";
-}
-
-std::string Graphics::InfoException::GetErrorInfo() const noexcept
-{
-	return info;
+	//HRESULT hr;
+	d3d->GetSwapChain()->Present(1u, 0u);
 }
